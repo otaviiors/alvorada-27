@@ -1,0 +1,578 @@
+{
+ "fontes": {
+  "populacao": "IBGE, Censo Demográfico 2022",
+  "densidade": "IBGE, Anuário Estatístico do Brasil 2024 (Censo 2022)",
+  "pib": "IBGE, Contas Regionais 2023",
+  "idhm": "PNUD/Ipea/FJP, Radar IDHM 2024",
+  "vocacao": "Resumo editorial do projeto (será substituído por dados setoriais do IBGE)"
+ },
+ "estados": {
+  "AC": {
+   "nome": "Acre",
+   "regiao": "Norte",
+   "capital": "Rio Branco",
+   "lat": -9.975,
+   "lon": -67.81,
+   "populacao": 830018,
+   "densidade": 5.06,
+   "pibPerCapita": 31675,
+   "pibBilhoes": 26.291,
+   "idhm": 0.754,
+   "vocacao": [
+    "Pecuária de corte",
+    "Extrativismo (castanha, borracha)",
+    "Serviços públicos"
+   ],
+   "rotulo": [
+    -69.553,
+    -9.671
+   ]
+  },
+  "AL": {
+   "nome": "Alagoas",
+   "regiao": "Nordeste",
+   "capital": "Maceió",
+   "lat": -9.665,
+   "lon": -35.735,
+   "populacao": 3127683,
+   "densidade": 112.38,
+   "pibPerCapita": 28675,
+   "pibBilhoes": 89.689,
+   "idhm": 0.746,
+   "vocacao": [
+    "Cana-de-açúcar e etanol",
+    "Turismo de praia",
+    "Química (sal-gema)"
+   ],
+   "rotulo": [
+    -36.603,
+    -9.767
+   ]
+  },
+  "AP": {
+   "nome": "Amapá",
+   "regiao": "Norte",
+   "capital": "Macapá",
+   "lat": 0.035,
+   "lon": -51.07,
+   "populacao": 733759,
+   "densidade": 5.15,
+   "pibPerCapita": 38187,
+   "pibBilhoes": 28.02,
+   "idhm": null,
+   "vocacao": [
+    "Serviços públicos",
+    "Mineração",
+    "Extrativismo e açaí"
+   ],
+   "rotulo": [
+    -51.87,
+    1.357
+   ]
+  },
+  "AM": {
+   "nome": "Amazonas",
+   "regiao": "Norte",
+   "capital": "Manaus",
+   "lat": -3.119,
+   "lon": -60.022,
+   "populacao": 3941613,
+   "densidade": 2.53,
+   "pibPerCapita": 41048,
+   "pibBilhoes": 161.795,
+   "idhm": null,
+   "vocacao": [
+    "Zona Franca de Manaus (eletroeletrônicos, motos)",
+    "Petróleo e gás (Urucu)",
+    "Comércio"
+   ],
+   "rotulo": [
+    -64.698,
+    -4.182
+   ]
+  },
+  "BA": {
+   "nome": "Bahia",
+   "regiao": "Nordeste",
+   "capital": "Salvador",
+   "lat": -12.971,
+   "lon": -38.501,
+   "populacao": 14141626,
+   "densidade": 25.04,
+   "pibPerCapita": 30476,
+   "pibBilhoes": 430.988,
+   "idhm": 0.759,
+   "vocacao": [
+    "Petroquímica (Camaçari)",
+    "Soja e algodão no oeste",
+    "Turismo"
+   ],
+   "rotulo": [
+    -41.72,
+    -12.473
+   ]
+  },
+  "CE": {
+   "nome": "Ceará",
+   "regiao": "Nordeste",
+   "capital": "Fortaleza",
+   "lat": -3.732,
+   "lon": -38.527,
+   "populacao": 8794957,
+   "densidade": 59.07,
+   "pibPerCapita": 26406,
+   "pibBilhoes": 232.239,
+   "idhm": 0.773,
+   "vocacao": [
+    "Serviços e comércio",
+    "Calçados e têxteis",
+    "Energia eólica e Porto do Pecém"
+   ],
+   "rotulo": [
+    -39.579,
+    -5.07
+   ]
+  },
+  "DF": {
+   "nome": "Distrito Federal",
+   "regiao": "Centro-Oeste",
+   "capital": "Brasília",
+   "lat": -15.794,
+   "lon": -47.882,
+   "populacao": 2817381,
+   "densidade": 489.06,
+   "pibPerCapita": 129790,
+   "pibBilhoes": 365.669,
+   "idhm": 0.866,
+   "vocacao": [
+    "Administração pública",
+    "Serviços",
+    "Comércio"
+   ],
+   "rotulo": [
+    -47.796,
+    -15.781
+   ]
+  },
+  "ES": {
+   "nome": "Espírito Santo",
+   "regiao": "Sudeste",
+   "capital": "Vitória",
+   "lat": -20.315,
+   "lon": -40.312,
+   "populacao": 3833712,
+   "densidade": 83.21,
+   "pibPerCapita": 54732,
+   "pibBilhoes": 209.83,
+   "idhm": 0.804,
+   "vocacao": [
+    "Petróleo e gás",
+    "Pelotas de minério e portos",
+    "Café e rochas ornamentais"
+   ],
+   "rotulo": [
+    -40.356,
+    -19.334
+   ]
+  },
+  "GO": {
+   "nome": "Goiás",
+   "regiao": "Centro-Oeste",
+   "capital": "Goiânia",
+   "lat": -16.686,
+   "lon": -49.264,
+   "populacao": 7056495,
+   "densidade": 20.74,
+   "pibPerCapita": 47721,
+   "pibBilhoes": 336.747,
+   "idhm": 0.815,
+   "vocacao": [
+    "Soja, milho e cana",
+    "Agroindústria",
+    "Farmacêutica (Anápolis)"
+   ],
+   "rotulo": [
+    -50.004,
+    -16.297
+   ]
+  },
+  "MA": {
+   "nome": "Maranhão",
+   "regiao": "Nordeste",
+   "capital": "São Luís",
+   "lat": -2.53,
+   "lon": -44.303,
+   "populacao": 6776699,
+   "densidade": 20.56,
+   "pibPerCapita": 22021,
+   "pibBilhoes": 149.227,
+   "idhm": 0.745,
+   "vocacao": [
+    "Soja no sul do estado",
+    "Porto do Itaqui (minério)",
+    "Alumínio"
+   ],
+   "rotulo": [
+    -45.279,
+    -5.062
+   ]
+  },
+  "MT": {
+   "nome": "Mato Grosso",
+   "regiao": "Centro-Oeste",
+   "capital": "Cuiabá",
+   "lat": -15.601,
+   "lon": -56.097,
+   "populacao": 3658649,
+   "densidade": 4.05,
+   "pibPerCapita": 74620,
+   "pibBilhoes": 273.009,
+   "idhm": 0.812,
+   "vocacao": [
+    "Soja, milho e algodão",
+    "Maior rebanho bovino",
+    "Agroindústria"
+   ],
+   "rotulo": [
+    -55.912,
+    -12.949
+   ]
+  },
+  "MS": {
+   "nome": "Mato Grosso do Sul",
+   "regiao": "Centro-Oeste",
+   "capital": "Campo Grande",
+   "lat": -20.469,
+   "lon": -54.62,
+   "populacao": 2757013,
+   "densidade": 7.72,
+   "pibPerCapita": 66884,
+   "pibBilhoes": 184.402,
+   "idhm": 0.797,
+   "vocacao": [
+    "Soja e milho",
+    "Pecuária",
+    "Celulose (eucalipto)"
+   ],
+   "rotulo": [
+    -54.845,
+    -20.327
+   ]
+  },
+  "MG": {
+   "nome": "Minas Gerais",
+   "regiao": "Sudeste",
+   "capital": "Belo Horizonte",
+   "lat": -19.917,
+   "lon": -43.934,
+   "populacao": 20539989,
+   "densidade": 35.02,
+   "pibPerCapita": 47321,
+   "pibBilhoes": 971.978,
+   "idhm": 0.809,
+   "vocacao": [
+    "Mineração de ferro",
+    "Siderurgia e automotiva",
+    "Café e leite"
+   ],
+   "rotulo": [
+    -44.555,
+    -18.507
+   ]
+  },
+  "PA": {
+   "nome": "Pará",
+   "regiao": "Norte",
+   "capital": "Belém",
+   "lat": -1.456,
+   "lon": -48.49,
+   "populacao": 8120131,
+   "densidade": 6.52,
+   "pibPerCapita": 31347,
+   "pibBilhoes": 254.547,
+   "idhm": 0.758,
+   "vocacao": [
+    "Mineração (Carajás)",
+    "Pecuária",
+    "Açaí e hidrelétricas"
+   ],
+   "rotulo": [
+    -53.323,
+    -4.814
+   ]
+  },
+  "PB": {
+   "nome": "Paraíba",
+   "regiao": "Nordeste",
+   "capital": "João Pessoa",
+   "lat": -7.119,
+   "lon": -34.845,
+   "populacao": 3974687,
+   "densidade": 70.39,
+   "pibPerCapita": 24395,
+   "pibBilhoes": 96.963,
+   "idhm": 0.76,
+   "vocacao": [
+    "Serviços",
+    "Cana-de-açúcar",
+    "Calçados e têxteis"
+   ],
+   "rotulo": [
+    -36.169,
+    -7.245
+   ]
+  },
+  "PR": {
+   "nome": "Paraná",
+   "regiao": "Sul",
+   "capital": "Curitiba",
+   "lat": -25.429,
+   "lon": -49.271,
+   "populacao": 11444380,
+   "densidade": 57.42,
+   "pibPerCapita": 58624,
+   "pibBilhoes": 670.919,
+   "idhm": 0.822,
+   "vocacao": [
+    "Soja, milho e frango",
+    "Automotiva (Curitiba)",
+    "Porto de Paranaguá e Itaipu"
+   ],
+   "rotulo": [
+    -51.623,
+    -24.635
+   ]
+  },
+  "PE": {
+   "nome": "Pernambuco",
+   "regiao": "Nordeste",
+   "capital": "Recife",
+   "lat": -8.047,
+   "lon": -34.877,
+   "populacao": 9058931,
+   "densidade": 92.37,
+   "pibPerCapita": 29857,
+   "pibBilhoes": 270.475,
+   "idhm": 0.767,
+   "vocacao": [
+    "Serviços e tecnologia (Porto Digital)",
+    "Complexo de Suape",
+    "Fruticultura no São Francisco"
+   ],
+   "rotulo": [
+    -39.727,
+    -8.04
+   ]
+  },
+  "PI": {
+   "nome": "Piauí",
+   "regiao": "Nordeste",
+   "capital": "Teresina",
+   "lat": -5.089,
+   "lon": -42.802,
+   "populacao": 3271199,
+   "densidade": 12.99,
+   "pibPerCapita": 24736,
+   "pibBilhoes": 80.917,
+   "idhm": 0.764,
+   "vocacao": [
+    "Serviços",
+    "Soja no cerrado",
+    "Energia eólica e solar"
+   ],
+   "rotulo": [
+    -42.882,
+    -7.949
+   ]
+  },
+  "RJ": {
+   "nome": "Rio de Janeiro",
+   "regiao": "Sudeste",
+   "capital": "Rio de Janeiro",
+   "lat": -22.907,
+   "lon": -43.173,
+   "populacao": 16055174,
+   "densidade": 366.97,
+   "pibPerCapita": 73052,
+   "pibBilhoes": 1172.871,
+   "idhm": 0.819,
+   "vocacao": [
+    "Petróleo e gás (pré-sal)",
+    "Serviços",
+    "Turismo"
+   ],
+   "rotulo": [
+    -42.558,
+    -22.37
+   ]
+  },
+  "RN": {
+   "nome": "Rio Grande do Norte",
+   "regiao": "Nordeste",
+   "capital": "Natal",
+   "lat": -5.795,
+   "lon": -35.209,
+   "populacao": 3302729,
+   "densidade": 62.54,
+   "pibPerCapita": 30804,
+   "pibBilhoes": 101.74,
+   "idhm": 0.778,
+   "vocacao": [
+    "Energia eólica",
+    "Petróleo e sal",
+    "Turismo e fruticultura"
+   ],
+   "rotulo": [
+    -36.656,
+    -5.748
+   ]
+  },
+  "RS": {
+   "nome": "Rio Grande do Sul",
+   "regiao": "Sul",
+   "capital": "Porto Alegre",
+   "lat": -30.035,
+   "lon": -51.218,
+   "populacao": 10882965,
+   "densidade": 38.63,
+   "pibPerCapita": 59736,
+   "pibBilhoes": 650.107,
+   "idhm": 0.818,
+   "vocacao": [
+    "Soja, arroz e carnes",
+    "Máquinas, calçados e automotiva",
+    "Vinho e agroindústria"
+   ],
+   "rotulo": [
+    -53.318,
+    -29.706
+   ]
+  },
+  "RO": {
+   "nome": "Rondônia",
+   "regiao": "Norte",
+   "capital": "Porto Velho",
+   "lat": -8.761,
+   "lon": -63.901,
+   "populacao": 1581196,
+   "densidade": 6.65,
+   "pibPerCapita": 48353,
+   "pibBilhoes": 76.456,
+   "idhm": 0.786,
+   "vocacao": [
+    "Pecuária",
+    "Soja",
+    "Hidrelétricas do Madeira"
+   ],
+   "rotulo": [
+    -63.183,
+    -10.865
+   ]
+  },
+  "RR": {
+   "nome": "Roraima",
+   "regiao": "Norte",
+   "capital": "Boa Vista",
+   "lat": 2.82,
+   "lon": -60.672,
+   "populacao": 636707,
+   "densidade": 2.85,
+   "pibPerCapita": 39460,
+   "pibBilhoes": 25.125,
+   "idhm": 0.78,
+   "vocacao": [
+    "Serviços públicos",
+    "Soja em expansão",
+    "Comércio de fronteira"
+   ],
+   "rotulo": [
+    -61.391,
+    2.086
+   ]
+  },
+  "SC": {
+   "nome": "Santa Catarina",
+   "regiao": "Sul",
+   "capital": "Florianópolis",
+   "lat": -27.595,
+   "lon": -48.548,
+   "populacao": 7610361,
+   "densidade": 79.5,
+   "pibPerCapita": 67459,
+   "pibBilhoes": 513.394,
+   "idhm": 0.833,
+   "vocacao": [
+    "Indústria diversificada (têxtil, metalmecânica)",
+    "Carnes (suínos e aves)",
+    "Tecnologia e turismo"
+   ],
+   "rotulo": [
+    -50.316,
+    -27.145
+   ]
+  },
+  "SP": {
+   "nome": "São Paulo",
+   "regiao": "Sudeste",
+   "capital": "São Paulo",
+   "lat": -23.551,
+   "lon": -46.633,
+   "populacao": 44411238,
+   "densidade": 178.92,
+   "pibPerCapita": 77566,
+   "pibBilhoes": 3444.814,
+   "idhm": 0.838,
+   "vocacao": [
+    "Indústria diversificada",
+    "Serviços financeiros",
+    "Cana e laranja"
+   ],
+   "rotulo": [
+    -48.613,
+    -22.165
+   ]
+  },
+  "SE": {
+   "nome": "Sergipe",
+   "regiao": "Nordeste",
+   "capital": "Aracaju",
+   "lat": -10.947,
+   "lon": -37.073,
+   "populacao": 2210004,
+   "densidade": 100.74,
+   "pibPerCapita": 27519,
+   "pibBilhoes": 60.817,
+   "idhm": 0.761,
+   "vocacao": [
+    "Petróleo e gás",
+    "Serviços",
+    "Laranja e cana"
+   ],
+   "rotulo": [
+    -37.38,
+    -10.59
+   ]
+  },
+  "TO": {
+   "nome": "Tocantins",
+   "regiao": "Norte",
+   "capital": "Palmas",
+   "lat": -10.184,
+   "lon": -48.333,
+   "populacao": 1511460,
+   "densidade": 5.45,
+   "pibPerCapita": 42553,
+   "pibBilhoes": 64.318,
+   "idhm": 0.797,
+   "vocacao": [
+    "Soja",
+    "Pecuária",
+    "Serviços públicos"
+   ],
+   "rotulo": [
+    -48.385,
+    -10.213
+   ]
+  }
+ }
+}

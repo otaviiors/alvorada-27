@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alvorada 27</title>
+<meta name="description" content="Alvorada 27: olhe o Brasil de cima, entenda cada estado e tente governar o país.">
+<meta name="theme-color" content="#0f2f45">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+<div id="app">
+  <div id="map" aria-label="Mapa do Brasil"></div>
+  <div id="sky" aria-hidden="true"></div>
+  <div id="clouds" aria-hidden="true"></div>
+
+  <header id="topbar">
+    <button id="brand" class="brand" type="button" aria-label="Sobre o Alvorada 27">
+      <svg id="sun" viewBox="-50 -50 100 100" aria-hidden="true"></svg>
+      <span class="brand-name">Alvorada <b>27</b></span>
+    </button>
+    <div class="mood">
+      <label for="mood-range" id="mood-label">Céu risonho</label>
+      <input id="mood-range" type="range" min="0" max="100" value="80">
+    </div>
+  </header>
+
+  <nav id="layers" aria-label="Camadas do mapa">
+    <button type="button" data-layer="regiao" class="on">Regiões</button>
+    <button type="button" data-layer="pibPerCapita">PIB per capita</button>
+    <button type="button" data-layer="idhm">IDHM</button>
+    <button type="button" data-layer="densidade">Densidade</button>
+  </nav>
+
+  <aside id="panel" aria-live="polite">
+    <div class="handle" aria-hidden="true"></div>
+    <div id="panel-body"></div>
+  </aside>
+
+  <div id="legend" aria-hidden="true"></div>
+
+  <dialog id="about">
+    <form method="dialog" class="about-inner">
+      <svg class="about-sun" viewBox="-50 -50 100 100" aria-hidden="true"></svg>
+      <h2>Por que <em>Alvorada 27</em>?</h2>
+      <p><b>Alvorada</b> é o palácio onde mora quem governa o Brasil. E é também o amanhecer: um país que acorda.</p>
+      <p><b>27</b> são as unidades da federação: 26 estados e o Distrito Federal. Cada raio do sol é uma delas. E 2027 é o ano em que começa um novo mandato.</p>
+      <p>A ideia nasceu num sofá em Pelotas, em outubro de 2026: e se desse para olhar o país de cima, entender cada parte e tentar fazer tudo conversar?</p>
+      <h3>Fontes dos dados</h3>
+      <ul id="sources"></ul>
+      <p class="small">Protótipo 0.1. Mapa com MapLibre; relevo de Terrain Tiles (Mapzen/AWS); contornos de rios e países da Natural Earth.</p>
+      <button class="btn">Fechar</button>
+    </form>
+  </dialog>
+</div>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>
