@@ -12,7 +12,7 @@ Alvorada 27 é um jogo web em três atos:
 
 ## Estado atual
 
-Protótipo 0.1 do Ato 1: mapa com relevo, quatro camadas (regiões, PIB per capita, IDHM, densidade), ficha por estado, ranking e o controle de "céu" que muda o clima do cenário.
+Protótipo 0.2 do Ato 1: o Brasil como maquete 3D (three.js), com vegetação por bioma, rios, cidades em miniatura, cinco camadas (natureza, regiões, PIB per capita, IDHM, densidade), ficha por estado e o controle de "céu". Direção visual em [docs/identidade-visual.md](docs/identidade-visual.md).
 
 ## Como abrir
 
@@ -24,7 +24,7 @@ Para rodar no computador, os dados precisam ser servidos por um servidor local (
 
 ```
 index.html            página principal
-src/app.js            lógica do mapa e do painel
+src/app.js            cena 3D, câmera e painel
 src/style.css         visual
 data/estados.geojson  contornos dos 27 estados
 data/estados-dados.json  números de cada estado, com fontes

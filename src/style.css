@@ -10,7 +10,7 @@
   --papel: #f3f0e6;          /* texto principal */
   --nevoa: #a9b8c2;          /* texto secundário */
   --linha: rgba(243, 240, 230, 0.14);
-  --hud: rgba(11, 31, 46, 0.82);
+  --hud: rgba(11, 31, 46, 0.9);
 
   --f-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
   --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -34,40 +34,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 :focus-visible { outline: 2px solid var(--ipe); outline-offset: 2px; }
 
 #app { position: fixed; inset: 0; }
-#map { position: absolute; inset: 0; }
-#map canvas {
-  filter:
-    saturate(calc(0.35 + var(--mood) * 0.85))
-    brightness(calc(0.62 + var(--mood) * 0.42))
-    contrast(calc(0.92 + var(--mood) * 0.12));
-  transition: filter 0.6s ease;
-}
-
-/* Céu: véu de cor por cima do mapa, muda com o humor */
-#sky {
-  position: absolute; inset: 0; pointer-events: none;
-  background:
-    linear-gradient(180deg,
-      rgba(255, 214, 120, calc(var(--mood) * 0.22)) 0%,
-      rgba(143, 195, 223, 0) 28%),
-    linear-gradient(180deg,
-      rgba(40, 46, 56, calc((1 - var(--mood)) * 0.55)) 0%,
-      rgba(40, 46, 56, calc((1 - var(--mood)) * 0.25)) 100%);
-  transition: background 0.6s ease;
-}
-
-/* Nuvens */
-#clouds { position: absolute; inset: 0; pointer-events: none; overflow: hidden; transition: opacity 0.8s ease; }
-.cloud {
-  position: absolute; border-radius: 50%;
-  background: radial-gradient(closest-side,
-    rgba(var(--cloud-rgb, 255, 255, 255), 0.85),
-    rgba(var(--cloud-rgb, 255, 255, 255), 0.35) 55%,
-    rgba(var(--cloud-rgb, 255, 255, 255), 0) 100%);
-  filter: blur(6px);
-  animation: drift linear infinite;
-}
-@keyframes drift { from { transform: translateX(-30vw); } to { transform: translateX(130vw); } }
+#stage { position: absolute; inset: 0; touch-action: none; }
+#stage canvas { display: block; width: 100%; height: 100%; }
+#labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 
 /* Barra superior */
 #topbar {
@@ -80,7 +49,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .brand {
   display: flex; align-items: center; gap: 10px;
   background: var(--hud); border: 1px solid var(--linha); border-radius: 999px;
-  padding: 6px 16px 6px 6px; backdrop-filter: blur(8px);
+  padding: 6px 16px 6px 6px;
 }
 .brand svg { width: 34px; height: 34px; }
 .brand-name { font: 700 19px/1 var(--f-display); letter-spacing: -0.01em; }
@@ -89,7 +58,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .mood {
   display: flex; align-items: center; gap: 10px;
   background: var(--hud); border: 1px solid var(--linha); border-radius: 999px;
-  padding: 8px 14px; backdrop-filter: blur(8px);
+  padding: 8px 14px;
 }
 .mood label { font: 600 12px/1 var(--f-body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--nevoa); white-space: nowrap; min-width: 96px; text-align: right; }
 .mood input { width: 120px; accent-color: var(--ipe); }
@@ -97,13 +66,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* Camadas */
 #layers {
   position: absolute; top: calc(64px + env(safe-area-inset-top, 0px));
-  left: calc(var(--panel-w) + 32px); right: max(16px, env(safe-area-inset-right, 0px));
+  left: calc(var(--panel-w) + 32px); right: calc(70px + env(safe-area-inset-right, 0px));
   display: flex; gap: 6px; flex-wrap: wrap;
 }
 #layers button {
   background: var(--hud); border: 1px solid var(--linha); border-radius: 999px;
   padding: 7px 14px; font-size: 13px; font-weight: 600; color: var(--nevoa);
-  backdrop-filter: blur(8px); transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 #layers button:hover { color: var(--papel); }
 #layers button.on { background: var(--ipe); color: var(--noite); border-color: var(--ipe); }
@@ -113,7 +82,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   position: absolute; right: max(16px, env(safe-area-inset-right, 0px));
   bottom: calc(28px + env(safe-area-inset-bottom, 0px));
   background: var(--hud); border: 1px solid var(--linha); border-radius: 10px;
-  padding: 10px 12px; font-size: 12px; color: var(--nevoa); backdrop-filter: blur(8px);
+  padding: 10px 12px; font-size: 12px; color: var(--nevoa);
   min-width: 180px;
 }
 #legend .ramp { height: 8px; border-radius: 4px; margin: 6px 0 4px; }
@@ -130,7 +99,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
   bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   width: var(--panel-w);
   background: var(--hud); border: 1px solid var(--linha); border-radius: 16px;
-  backdrop-filter: blur(10px);
   display: flex; flex-direction: column; overflow: hidden;
 }
 .handle { display: none; }
@@ -174,12 +142,21 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; padding: 6px 12px; font-size: 13px; }
 .src { font-size: 11px; color: var(--nevoa); margin-top: 18px; line-height: 1.6; }
 
-/* Marcadores */
-.mk-cap { display: flex; align-items: center; gap: 5px; pointer-events: none; }
-.mk-cap i { width: 7px; height: 7px; border-radius: 50%; background: var(--papel); box-shadow: 0 0 0 2px rgba(11, 31, 46, 0.8); }
-.mk-cap span { font: 600 11px/1 var(--f-body); color: var(--papel); text-shadow: 0 1px 3px rgba(0,0,0,0.9); white-space: nowrap; }
-.mk-uf { font: 800 13px/1 var(--f-display); color: rgba(11, 31, 46, 0.78); letter-spacing: 0.04em; pointer-events: none; text-shadow: 0 1px 0 rgba(255,255,255,0.35); }
-.hide-caps .mk-cap { display: none; }
+/* Rótulos sobre a maquete */
+.lb { position: absolute; left: 0; top: 0; will-change: transform; white-space: nowrap; }
+.lb-uf { font: 800 13px/1 var(--f-display); letter-spacing: 0.06em; color: #fffaf0;
+  text-shadow: 0 1px 2px rgba(20, 14, 6, 0.9), 0 0 8px rgba(20, 14, 6, 0.5); transform-origin: center; }
+.lb-cap { display: flex; align-items: center; gap: 5px; }
+.lb-cap i { width: 6px; height: 6px; border-radius: 50%; background: var(--ipe); box-shadow: 0 0 0 2px rgba(11, 31, 46, 0.85); }
+.lb-cap span { font: 600 11px/1 var(--f-body); color: #fffaf0; text-shadow: 0 1px 3px rgba(0,0,0,0.95); }
+.lb.off { display: none; }
+
+/* Zoom */
+#zoom { position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(64px + env(safe-area-inset-top, 0px));
+  display: flex; flex-direction: column; background: var(--hud); border: 1px solid var(--linha); border-radius: 10px; overflow: hidden; }
+#zoom button { width: 38px; height: 38px; background: none; border: 0; font: 600 20px/1 var(--f-body); }
+#zoom button + button { border-top: 1px solid var(--linha); }
+#zoom button:hover { background: rgba(243, 240, 230, 0.08); }
 
 /* Sobre */
 dialog#about {
@@ -196,10 +173,6 @@ dialog#about::backdrop { background: rgba(5, 14, 22, 0.6); backdrop-filter: blur
 .about-inner p { margin: 0 0 10px; max-width: 62ch; }
 .about-inner ul { margin: 0; padding-left: 18px; font-size: 13px; color: var(--nevoa); }
 .about-inner .small { font-size: 12px; color: var(--nevoa); margin-top: 14px; }
-
-.maplibregl-ctrl-attrib { font-size: 10px; }
-.maplibregl-ctrl-group { background: var(--hud) !important; }
-.maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: invert(1); }
 
 /* Celular */
 @media (max-width: 760px) {
@@ -223,10 +196,7 @@ dialog#about::backdrop { background: rgba(5, 14, 22, 0.6); backdrop-filter: blur
   #panel-body { padding: 10px max(16px, env(safe-area-inset-left, 0px)) 18px max(16px, env(safe-area-inset-right, 0px)); }
   .panel-title { font-size: 25px; }
   #legend { bottom: auto; top: calc(108px + env(safe-area-inset-top, 0px)); min-width: 0; padding: 8px 10px; }
-  .maplibregl-ctrl-bottom-right, .maplibregl-ctrl-top-right { display: none; }
+  #zoom { display: none; }
+  #legend.simple { display: none; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .cloud { animation: none; }
-  #map canvas, #sky { transition: none; }
-}

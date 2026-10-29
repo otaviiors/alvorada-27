@@ -9,14 +9,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <link rel="stylesheet" href="src/style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+} }
+</script>
 </head>
 <body>
 <div id="app">
-  <div id="map" aria-label="Mapa do Brasil"></div>
-  <div id="sky" aria-hidden="true"></div>
-  <div id="clouds" aria-hidden="true"></div>
+  <div id="stage" aria-label="Maquete do Brasil"></div>
+  <div id="labels" aria-hidden="true"></div>
 
   <header id="topbar">
     <button id="brand" class="brand" type="button" aria-label="Sobre o Alvorada 27">
@@ -30,7 +34,8 @@
   </header>
 
   <nav id="layers" aria-label="Camadas do mapa">
-    <button type="button" data-layer="regiao" class="on">Regiões</button>
+    <button type="button" data-layer="natureza" class="on">Natureza</button>
+    <button type="button" data-layer="regiao">Regiões</button>
     <button type="button" data-layer="pibPerCapita">PIB per capita</button>
     <button type="button" data-layer="idhm">IDHM</button>
     <button type="button" data-layer="densidade">Densidade</button>
@@ -38,10 +43,14 @@
 
   <aside id="panel" aria-live="polite">
     <div class="handle" aria-hidden="true"></div>
-    <div id="panel-body"></div>
+    <div id="panel-body"><p class="eyebrow">Carregando</p><p>Montando a maquete…</p></div>
   </aside>
 
   <div id="legend" aria-hidden="true"></div>
+  <div id="zoom" role="group" aria-label="Zoom">
+    <button type="button" data-zoom="in" aria-label="Aproximar">+</button>
+    <button type="button" data-zoom="out" aria-label="Afastar">−</button>
+  </div>
 
   <dialog id="about">
     <form method="dialog" class="about-inner">
@@ -52,12 +61,11 @@
       <p>A ideia nasceu num sofá em Pelotas, em outubro de 2026: e se desse para olhar o país de cima, entender cada parte e tentar fazer tudo conversar?</p>
       <h3>Fontes dos dados</h3>
       <ul id="sources"></ul>
-      <p class="small">Protótipo 0.1. Mapa com MapLibre; relevo de Terrain Tiles (Mapzen/AWS); contornos de rios e países da Natural Earth.</p>
+      <p class="small">Protótipo 0.2. Cena 3D com three.js; contornos do IBGE; rios da Natural Earth. Vegetação e cidades são ilustrativas.</p>
       <button class="btn">Fechar</button>
     </form>
   </dialog>
 </div>
-<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
-<script src="src/app.js"></script>
+<script type="module" src="src/app.js"></script>
 </body>
 </html>
