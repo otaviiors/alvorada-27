@@ -12,7 +12,7 @@ Alvorada 27 é um jogo web em três atos:
 
 ## Estado atual
 
-**Protótipo 0.6:** o modo Governar é jogável do começo ao fim, com tutorial guiado pela chefe de gabinete, glossário de termos e números traduzidos em gente. Regras em [docs/design-do-jogo.md](docs/design-do-jogo.md), números em [docs/calibragem.md](docs/calibragem.md).
+**Protótipo 0.7:** o modo Governar é jogável do começo ao fim, com tutorial guiado pela chefe de gabinete, glossário de termos, números traduzidos em gente, oito grupos da sociedade formando a aprovação, cinco cidadãos que comentam cada ano e o jornal *Diário da Alvorada*. Regras em [docs/design-do-jogo.md](docs/design-do-jogo.md), números em [docs/calibragem.md](docs/calibragem.md).
 
 Protótipo 0.4 do Ato 1: tela inicial e o Brasil como maquete de relevo no mar (three.js), com ondas, nuvens, aves e aviões; relevo real exagerado, vegetação por bioma, rios, os 5.570 municípios em miniatura (tamanho pela população do Censo 2022), ícones de economia por estado, cinco camadas em botões laterais, ficha por estado, menu e opção de esconder a interface. Direção visual em [docs/identidade-visual.md](docs/identidade-visual.md).
 
@@ -33,6 +33,7 @@ src/ambiente.js       mar, ondas, nuvens, aves e aviões
 src/icones.js         ícones de economia e das camadas
 src/jogo/regras.js    regras e números de calibragem do modo Governar
 src/jogo/motor.js     motor do jogo (sem gráfico; roda no navegador e no Node)
+src/jogo/povo.js      grupos da sociedade, cidadãos e o jornal Diário da Alvorada
 scripts/simular.mjs   simula partidas com estilos diferentes
 data/jogo/inicio.json condições iniciais reais do mandato 2027
 src/style.css         visual

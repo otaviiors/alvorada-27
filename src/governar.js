@@ -3,7 +3,8 @@
 import {
   criarJogo, escolherPromessas, montarProjeto, executarProjeto, desfazerProjeto, responderEvento, negociar,
   fecharAno, relatorioFinal, resumoEfeitos, chanceVotacao, eventosPendentes,
-  REGIOES, AREAS, TIPOS, TAMANHOS, PROMESSAS, CAMARA, NEGOCIACOES, ORCAMENTO
+  REGIOES, AREAS, TIPOS, TAMANHOS, PROMESSAS, CAMARA, NEGOCIACOES, ORCAMENTO,
+  GRUPOS, CIDADAOS, ELEITORES, quemGosta, gostosDoGrupo
 } from "./jogo/motor.js";
 import { iconSVG, ICONES } from "./icones.js";
 import { criarTutorial, termo } from "./tutorial.js";
@@ -34,6 +35,11 @@ function corEscala(v, [bom, ruim]) {
 }
 const FORCA_TRABALHO = 110e6;   // força de trabalho aproximada (PNAD Contínua)
 const fmtGente = n => n >= 1e6 ? nf(n / 1e6, 1) + (n >= 2e6 ? " milhões" : " milhão") : n >= 1000 ? nf(Math.round(n / 1000), 0) + " mil" : nf(Math.round(n), 0);
+/* rostinho do humor de um cidadão */
+const HUMOR = { feliz: ["gostou do ano", "#3f8f5a", "M6 11.5q4 4.5 8 0"], neutro: ["ano normal", "#e2b84a", "M6.5 13h7"], preocupado: ["ano difícil", "#b8452f", "M6 14.5q4-4 8 0"] };
+const rosto = h => { const [t, c, d] = HUMOR[h] || HUMOR.neutro;
+  return `<svg class="rosto" viewBox="0 0 20 20" width="18" height="18" role="img" aria-label="${t}"><circle cx="10" cy="10" r="9" fill="${c}"/><circle cx="7" cy="8" r="1.3" fill="#1a1a1a"/><circle cx="13" cy="8" r="1.3" fill="#1a1a1a"/><path d="${d}" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round"/></svg>`; };
+const sinal = d => d > 0 ? `<em class="bom">+${d}</em>` : d < 0 ? `<em class="ruim">−${-d}</em>` : `<em>=</em>`;
 const iniciais = nome => nome.split(" ").filter(Boolean).map(x => x[0]).slice(0, 2).join("");
 
 export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
@@ -120,6 +126,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     { id: "montar", nome: "Montar", icone: "i_montar" },
     { id: "congresso", nome: "Congresso", icone: "i_aprovacao" },
     { id: "orcamento", nome: "Orçamento", icone: "i_dinheiro" },
+    { id: "povo", nome: "Povo", icone: "i_povo" },
     { id: "previsoes", nome: "Previsões", icone: "i_previsao" }
   ];
   function renderAbas() {
@@ -129,7 +136,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
       ${iconSVG(a.icone, 16)}<span>${a.nome}</span>${a.id === "eventos" && pend ? `<b class="badge">${pend}</b>` : ""}</button>`).join("");
   }
   function renderCorpo() {
-    const f = { eventos: abaEventos, ministros: abaMinistros, montar: abaMontar, congresso: abaCongresso, orcamento: abaOrcamento, previsoes: abaPrevisoes }[aba];
+    const f = { eventos: abaEventos, ministros: abaMinistros, montar: abaMontar, congresso: abaCongresso, orcamento: abaOrcamento, povo: abaPovo, previsoes: abaPrevisoes }[aba];
     $("#gov-body").innerHTML = f();
     if (aba === "montar") atualizarMontar();
   }
@@ -172,10 +179,18 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
       </dl>
       <ul class="pj-ef">${ef.map(x => `<li class="${x.bom ? "bom" : "ruim"}"><span>${esc(x.ind)}</span><b>${esc(x.texto)}</b></li>`).join("") || "<li>Efeito pequeno</li>"}</ul>
       ${emGente(p)}
+      ${quem(p)}
       ${p.temporario ? `<p class="pj-nota">Transferência: o efeito vale só neste ano.</p>` : ""}
       ${voto ? `<p class="pj-voto">${iconSVG("i_congresso", 14)} Precisa de votação${extra ? " (crédito além do orçamento)" : ""}: <b>${chance}% de chance</b></p>` : ""}
       ${estado ? `<p class="pj-estado ${estado.ok ? "ok" : "nao"}">${esc(estado.texto)}</p>` : acao ? `<button type="button" class="btn ${extra ? "ghost" : ""} wide" ${acao}>${extra ? "Aprovar com dinheiro extra" : "Aprovar"}</button>` : ""}
     </article>`;
+  }
+
+  /* que grupos da sociedade gostam ou não do projeto */
+  function quem(p) {
+    const q = quemGosta(p);
+    if (!q.agrada.length && !q.desagrada.length) return "";
+    return `<p class="pj-quem">${q.agrada.length ? `<span class="ok">Agrada: ${q.agrada.map(esc).join(", ")}</span>` : ""}${q.desagrada.length ? `<span class="nao">Desagrada: ${q.desagrada.map(esc).join(", ")}</span>` : ""}</p>`;
   }
 
   /* números traduzidos em gente */
@@ -274,6 +289,28 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
       <p class="ajuda">Dinheiro não usado reduz a dívida. Gastar além do orçamento aumenta a dívida, freia o crescimento do ano seguinte e, acima de R$ 20 bi, derruba a aprovação.</p>
       ${desteAno.length ? `<ul class="feitos">${desteAno.map(p => `<li><span>${esc(p.nome)}</span><b>${esc(bi(p.custo))}</b><button type="button" class="link" data-desfazer="${p.id}">Desfazer</button></li>`).join("")}</ul>` : `<p class="vazio">Nenhum projeto aprovado em ${e.ano} ainda.</p>`}`;
   }
+  function abaPovo() {
+    const nomesAreas = l => l.map(a => AREAS[a].nome.toLowerCase()).join(", ");
+    const grupos = Object.entries(GRUPOS).sort((a, b) => b[1].peso - a[1].peso).map(([k, G]) => {
+      const v = e.grupos[k], d = v - e.ini.grupos[k], eleit = G.peso * ELEITORES, gg = gostosDoGrupo(k);
+      return `<li class="grupo">
+        <div class="gr-top"><b>${esc(G.nome)}</b><span class="gr-v">${v}%${e.ano > e.anoInicial || e.fase === "fim" ? sinal(d) : ""}</span></div>
+        <div class="md-bar"><i style="width:${v}%;background:${G.cor}"></i></div>
+        <small>${esc(G.resumo)} ≈ ${esc(fmtGente(eleit))} de eleitores, ${esc(fmtGente(v / 100 * eleit))} aprovam.${gg.gosta.length ? ` Gostam de projetos de ${esc(nomesAreas(gg.gosta))}.` : ""}${gg.torce.length ? ` Torcem o nariz para ${esc(nomesAreas(gg.torce))}.` : ""}</small>
+      </li>`;
+    }).join("");
+    const cid = Object.entries(CIDADAOS).map(([r, C]) => {
+      const x = e.cidadaos && e.cidadaos[r];
+      return `<li class="cid" data-cid="${esc(r)}"><span class="avatar" style="--c:${C.cor}">${esc(iniciais(C.nome))}</span>
+        <div><b>${esc(C.chamada)}</b> <small>${C.idade} anos, ${esc(C.oficio)}, ${esc(C.cidade)}</small>
+        ${x ? `<p>${rosto(x.humor)} “${esc(x.fala)}”</p>` : `<p class="ajuda">Se importa com ${esc(C.importa)}. Vai dar a opinião no fim do ano.</p>`}</div></li>`;
+    }).join("");
+    return `<p class="intro">A aprovação é a soma de oito grupos da sociedade. Cada um pesa as coisas de um jeito: o que agrada a um pode irritar outro. ${e.ano > e.anoInicial || e.fase === "fim" ? "Os números ao lado mostram a mudança desde a posse." : ""}</p>
+      <ul class="grupos">${grupos}</ul>
+      <h3 class="sub">Um brasileiro de cada região</h3>
+      <ul class="cids">${cid}</ul>
+      <p class="ajuda">Grupos e pessoas fictícios. O tamanho de cada grupo é uma simplificação do jogo.</p>`;
+  }
   function abaPrevisoes() {
     return `<p class="intro">Boletim feito no fim do ano anterior pelos órgãos de clima, desastres e economia. As previsões têm margem de erro: às vezes o evento vem mais forte, às vezes nem acontece. Investir em <b>ciência e monitoramento</b> (Meio ambiente, contratar, Brasil todo) deixa as previsões mais precisas.</p>
       ${e.previsoes.length ? `<ul class="prev">${e.previsoes.map(p => `<li class="${p.bom ? "bom" : ""}"><div class="pv-ch"><b>${p.chance}%</b></div><div><b>${esc(p.nome)}</b><small>${p.regiao ? esc(p.regiao) : "Nacional"}${p.causa ? " · " + esc(p.causa) : ""} · ${p.sevMin === p.sevMax ? SEV[p.sevMin] : `de ${SEV[p.sevMin]} a ${SEV[p.sevMax]}`}</small></div></li>`).join("")}</ul>` : `<p class="vazio">Sem previsões.</p>`}
@@ -325,12 +362,40 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     if (Math.abs(km) >= 50) f.push(km > 0 ? `<b>${esc(fmtGente(km * 140))}</b> campos de futebol de floresta a menos derrubados` : `<b>${esc(fmtGente(-km * 140))}</b> campos de futebol a mais derrubados`);
     return f.length ? `<p class="gente-ano">Em gente: ${f.join(" · ")}.</p>` : "";
   }
+  const ROTULO = { evento: "País", obra: "Obras", congresso: "Política", pesquisa: "Pesquisa" };
+  function jornal(rel) {
+    const j = rel.jornal || [];
+    const pri = j.find(x => x.tipo === "principal"), nota = j.find(x => x.tipo === "nota");
+    const outras = j.filter(x => x !== pri && x !== nota);
+    if (!pri) return "";
+    return `<section class="jornal" aria-label="Jornal">
+      <header class="jn-cab"><span>Edição de fim de ano · ${rel.ano}</span><b>Diário da Alvorada</b><span>Jornal fictício</span></header>
+      <h3 class="jn-man">${esc(pri.titulo)}</h3>
+      ${pri.sub ? `<p class="jn-sub">${esc(pri.sub)}</p>` : ""}
+      ${outras.length ? `<div class="jn-cols">${outras.map(x => `<article><small>${ROTULO[x.tipo] || ""}</small><h4>${esc(x.titulo)}</h4>${x.sub ? `<p>${esc(x.sub)}</p>` : ""}</article>`).join("")}</div>` : ""}
+      ${nota ? `<p class="jn-nota"><b>Bastidores</b> ${esc(nota.titulo)}</p>` : ""}
+    </section>`;
+  }
+  function vozes(rel) {
+    if (!rel.cidadaos) return "";
+    return `<h3 class="sub">O que o povo diz</h3><ul class="vozes">${Object.entries(rel.cidadaos).map(([r, x]) => { const C = CIDADAOS[r];
+      return `<li><header><span class="avatar" style="--c:${C.cor}">${esc(iniciais(C.nome))}</span><div><b>${esc(C.chamada)}</b><small>${C.idade} anos · ${esc(C.oficio)} · ${esc(C.cidade)}</small></div>${rosto(x.humor)}</header><p>“${esc(x.fala)}”</p></li>`; }).join("")}</ul>`;
+  }
+  function gruposAno(rel) {
+    if (!rel.grupos) return "";
+    const l = Object.entries(rel.grupos).sort((a, b) => b[1].delta - a[1].delta);
+    return `<h3 class="sub">Como cada grupo reagiu</h3><ul class="grupos mini">${l.map(([k, x]) => `<li class="grupo"><div class="gr-top"><b>${esc(GRUPOS[k].nome)}</b><span class="gr-v">${x.valor}%${sinal(x.delta)}</span></div><div class="md-bar"><i style="width:${x.valor}%;background:${GRUPOS[k].cor}"></i></div></li>`).join("")}</ul>
+      <p class="ajuda">A aprovação geral (${Math.round(rel.depois.aprovacao)}%, ≈ ${esc(fmtGente(rel.depois.aprovacao / 100 * ELEITORES))} de eleitores) é a média dos grupos, pesada pelo tamanho de cada um.</p>`;
+  }
   function telaAno(rel) {
     const proximo = e.fase !== "fim";
     modal(`<p class="eyebrow">Balanço de ${rel.ano}</p>
-      <h2>${rel.crescimento >= 2.5 ? "Um ano de crescimento forte." : rel.crescimento >= 1.5 ? "Um ano de crescimento moderado." : rel.crescimento >= 0 ? "Um ano de economia fraca." : "O país entrou em recessão."}</h2>
+      ${jornal(rel)}
+      ${vozes(rel)}
+      <h3 class="sub">Os termômetros</h3>
       <table class="tab-ind"><tbody>${IND.map(i => linhaInd(i, rel.antes[i.id], rel.depois[i.id])).join("")}</tbody></table>
       ${resumoGente(rel.antes, rel.depois)}
+      ${gruposAno(rel)}
       ${rel.eventos.length ? `<h3 class="sub">Eventos</h3><ul class="lista">${rel.eventos.map(x => `<li><b>${esc(x.nome)}</b> ${x.regiao ? "(" + esc(x.regiao) + ")" : ""}: ${esc(x.resposta || "")}</li>`).join("")}</ul>` : ""}
       ${rel.prontos.length ? `<h3 class="sub">Projetos que começaram a fazer efeito</h3><ul class="lista">${rel.prontos.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}
       ${rel.votacoes.length ? `<h3 class="sub">Votações</h3><ul class="lista">${rel.votacoes.map(v => `<li>${esc(v.nome)}: <b>${v.aprovado ? "aprovado" : "rejeitado"}</b></li>`).join("")}</ul>` : ""}
@@ -365,6 +430,8 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     if (snap) { snapshot = snap.dataset.snap; renderTopo(); pintarMapa(); return; }
     const ab = t.closest("[data-aba]");
     if (ab) { aba = ab.dataset.aba; confirmando = false; ultimoMontado = null; renderAbas(); renderCorpo(); renderRodape(); abrirPainel(); tut.fecharBalao(); tut.dicaAba(aba); tut.aposRender(); return; }
+    const cid = t.closest("[data-cid]");
+    if (cid) { mapa.voarRegiao(cid.dataset.cid); return; }
     const pr = t.closest("[data-prom]");
     if (pr) {
       const id = pr.dataset.prom;

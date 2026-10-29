@@ -7,6 +7,7 @@ import {
   EFEITOS, TIPO_MULT, TEMPORARIO, PRESSAO_FLORESTA, REGIOES_FLORESTA, MEIA_VIDA, TENDENCIA, VOTACAO,
   PROMESSAS, MINISTROS, GOVERNADORES, CAMARA, NEGOCIACOES, EVENTOS
 } from "./regras.js";
+import { iniciarPovo, atualizarGrupos, aprovacaoGeral, reacoesCidadaos, manchetes, GRUPOS, CIDADAOS, ELEITORES, quemGosta, gostosDoGrupo } from "./povo.js";
 
 /* ---------- utilidades ---------- */
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -64,7 +65,9 @@ export function criarJogo(inicio, { semente = Date.now() % 2147483647, anos = 4 
   };
   recalcularNacional(e);
   e.nac.idhm = n.idhm; e.nac.desemprego = n.desemprego; e.nac.mvi = n.mvi;   // valores oficiais nacionais no ano zero
+  iniciarPovo(e, n.aprovacao);
   e.ini = retrato(e);
+  e.ini.grupos = { ...e.grupos };
   e.previsoes = gerarPrevisoes(e);
   return e;
 }
@@ -362,6 +365,7 @@ export function fecharAno(e) {
   if (e.fase !== "decisoes") throw new Error("Não há ano aberto.");
   if (eventosPendentes(e).length) throw new Error("Responda aos eventos antes de fechar o ano.");
   const rnd = rngDe(e);
+  if (!e.grupos) iniciarPovo(e, e.nac.aprovacao);   // mandatos salvos antes da versão com grupos
   const antes = retrato(e);
 
   // desfaz efeitos temporários do ano anterior
@@ -448,7 +452,8 @@ export function fecharAno(e) {
     congEv += (def.dano.congresso || 0) * m + (resp.congresso || 0);
     divEv += resp.divida || 0;
     if (resp.governador && def.regiao) e.reg[def.regiao].governador = clamp(e.reg[def.regiao].governador + resp.governador, 0, 100);
-    relatoEventos.push({ nome: ev.nome, regiao: ev.regiao, sev: ev.sev, resposta: resp.texto, bom: ev.bom });
+    relatoEventos.push({ id: ev.id, nome: ev.nome, regiao: ev.regiao, sev: ev.sev, resposta: resp.texto, bom: ev.bom,
+      alivio: resp.alivio ?? (ev.bom ? 1 : 0) });
   }
 
   // 5. limites
@@ -468,10 +473,18 @@ export function fecharAno(e) {
   const dDes = e.nac.desemprego - antes.nac.desemprego;
   const dIdh = e.nac.idhm - antes.nac.idhm - TENDENCIA.idh;
   const dMvi = (e.nac.mvi - antes.nac.mvi) / antes.nac.mvi * 100;
-  // a aprovação tende a voltar para perto de 45: o povo cobra o que foi feito recentemente
-  let apr = e.nac.aprovacao + 0.25 * (45 - e.nac.aprovacao) - TENDENCIA.desgaste + 1.5 * (g - TENDENCIA.crescimento) - 2.5 * dDes + 400 * dIdh - 0.12 * dMvi + aprProj + aprEv;
-  if (e.gastoExtra > 20) apr -= (e.gastoExtra - 20) / 10;               // mercado nervoso, inflação
-  e.nac.aprovacao = Math.round(clamp(apr, 5, 85));
+  // a aprovação é a soma dos grupos da sociedade; cada grupo pesa as coisas de um jeito
+  const dDsm = antes.nac.desmatamento ? (e.nac.desmatamento - antes.nac.desmatamento) / antes.nac.desmatamento * 100 : 0;
+  const anunciados = e.projetosAno.map(id => e.projetos.find(x => x.id === id)).filter(p => p && !prontos.includes(p));
+  const ctxPovo = {
+    desgaste: TENDENCIA.desgaste, cres: 1.5 * (g - TENDENCIA.crescimento), des: -2.5 * dDes, idh: 400 * dIdh, mvi: -0.12 * dMvi,
+    dsm: -0.04 * dDsm, div: -0.5 * (e.nac.divida - antes.nac.divida - TENDENCIA.dividaJuros),
+    extra: e.gastoExtra > 20 ? -(e.gastoExtra - 20) / 10 : 0, eventos: aprEv, prontos, anunciados
+  };
+  void aprProj;
+  const dGrupos = atualizarGrupos(e, ctxPovo);
+  e.nac.aprovacao = Math.round(clamp(aprovacaoGeral(e), 3, 92));
+  const cidadaos = reacoesCidadaos(e, antes, { ...ctxPovo, g, gastoExtra: e.gastoExtra, eventos: relatoEventos });
   e.nac.congresso = Math.round(clamp(0.7 * e.nac.congresso + 0.3 * e.nac.aprovacao + congEv - e.gastoExtra / 20, 5, 95));
 
   // 7. manutenção que fica para os próximos anos
@@ -484,8 +497,12 @@ export function fecharAno(e) {
   const relatorio = {
     ano: e.ano, economia: e.caixa, crescimento: e.nac.crescimento, gastoExtra: e.gastoExtra,
     antes: antes.nac, depois: copia(e.nac), prontos: prontos.map(p => p.nome), eventos: relatoEventos,
-    votacoes: e.votacoes.slice(), manutencao: e.manutencao
+    votacoes: e.votacoes.slice(), manutencao: e.manutencao,
+    grupos: Object.fromEntries(Object.keys(GRUPOS).map(k => [k, { valor: e.grupos[k], delta: dGrupos[k] }])),
+    cidadaos
   };
+  relatorio.jornal = manchetes(e, relatorio, { eventos: relatoEventos, prontos }, dGrupos, rnd);
+  e.jornais.push({ ano: e.ano, manchetes: relatorio.jornal });
   e.historico.push({ ano: e.ano, nac: copia(e.nac), reg: copia(e.reg), projetos: e.projetosAno.slice(), relatorio });
 
   if (e.ano >= e.anoFinal) { e.fase = "fim"; e.previsoes = []; return relatorio; }
@@ -545,4 +562,5 @@ export function relatorioFinal(e) {
   return { promessas, indicadores: ind, porRegiao: perCap, porArea, regEsquecida, regFavorita, areaFoco, areaIgnorada, reflexao: frases, manutencao: e.manutencao };
 }
 
+export { GRUPOS, CIDADAOS, ELEITORES, quemGosta, gostosDoGrupo };
 export { REGIOES, AREAS, TIPOS, TAMANHOS, PROMESSAS, MINISTROS, GOVERNADORES, CAMARA, NEGOCIACOES, ORCAMENTO };

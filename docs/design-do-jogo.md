@@ -188,7 +188,7 @@ Dificuldade e duração são escolhas separadas.
 - **Honesto.** Os dados de partida são reais e citados. Os efeitos das decisões vêm de um modelo simplificado, e o jogo diz isso.
 - **Ensina jogando.** Cada regra deve ensinar algo verdadeiro sobre como o Brasil é governado.
 
-## 11. Engajamento: contexto, objetivo e pessoas — *decidido (29/10/2026); entrega 1 (tutorial e linguagem) pronta*
+## 11. Engajamento: contexto, objetivo e pessoas — *decidido (29/10/2026); entregas 1 (tutorial e linguagem) e 2 (cidadãos, grupos e jornal) prontas*
 
 Primeiro teste do Otávio (29/10/2026): o jogo é educativo, mas faltou contexto, tutorial e um objetivo claro; foi preciso esforço para se interessar. Como ele não gosta de política, é exatamente o público a conquistar.
 
@@ -209,14 +209,15 @@ Decisões da conversa: **nota + reeleição + missões**; **cidadãos + manchete
 ### Pessoas no lugar de números
 - **Cinco cidadãos principais**, um por região, fictícios, com nome, idade, profissão, cidade e o que mais importa para eles. Cada um tem humor (feliz, neutro, preocupado) e uma fala por ano reagindo ao que aconteceu na região.
 - **Grupos da sociedade**, cada um com sua aprovação: trabalhadores, empresários, agricultores, famílias de baixa renda, jovens e estudantes, aposentados, ambientalistas, moradores das grandes cidades. Cada grupo gosta e desgosta de coisas diferentes. A aprovação nacional passa a ser a média dos grupos, e o jogador entende **quem** está satisfeito e por quê.
+- **Como funciona (entrega 2, 29/10/2026):** cada grupo tem um peso no eleitorado (trabalhadores 22%, baixa renda 20%, jovens 14%, aposentados 14%, grandes cidades 14%, agricultores 6%, empresários 5%, ambientalistas 5%; simplificação do jogo) e reage de um jeito ao crescimento, ao emprego, à qualidade de vida, à violência, ao desmatamento, à dívida e ao gasto extra. Projetos agradam ou irritam conforme a área, e a diferença entre grupos cresce com o tamanho do projeto. O cartão de cada projeto mostra **quem ele agrada e quem desagrada**. A aba **Povo** mostra os grupos (com eleitores em gente: "≈ 34 milhões de eleitores, 19 milhões aprovam") e os cinco cidadãos: Joana (Santarém), Seu Antônio (Juazeiro), Camila (São Paulo), Dona Lurdes (Pelotas) e Rafael (Sorriso). Tocar num cidadão leva o mapa até a região dele.
 - **Números traduzidos em gente (regra fixa do projeto, 29/10/2026):** todo número mostrado ao jogador vem com uma escala visível. 0,1 ponto de desemprego ≈ 110 mil pessoas; 0,1 morte por 100 mil ≈ 210 vidas por ano; 1 km² de floresta ≈ 140 campos de futebol.
 
 ### Manchetes
-- No fim de cada ano, a capa de um jornal fictício (*Diário da Alvorada*) com 3 ou 4 manchetes geradas a partir do que aconteceu, com um pouco de humor e sem citar pessoas ou partidos reais.
+- No fim de cada ano, a capa de um jornal fictício (*Diário da Alvorada*) com 3 ou 4 manchetes geradas a partir do que aconteceu, com um pouco de humor e sem citar pessoas ou partidos reais. Pronto na entrega 2: manchete principal (economia e emprego), eventos e a resposta do governo, obra que ficou pronta, derrota no Congresso, pesquisa de aprovação (com eleitores em gente) e uma nota de "Bastidores" com humor. O jornal abre o balanço do ano, seguido das falas dos cidadãos e de como cada grupo reagiu.
 
 ### Tutorial
 - Antes do mandato: "Primeira vez? Governar com a ajuda do gabinete" ou "Já sei jogar".
-- **Chefe de gabinete** (personagem fictício) guia o primeiro ano passo a passo: o país herdado, as promessas, os eventos, as propostas, o orçamento, fechar o ano. As abas são liberadas aos poucos (Montar, Congresso e Previsões a partir do ano 2, com uma dica cada).
+- **Chefe de gabinete** (personagem fictício) guia o primeiro ano passo a passo: o país herdado, as promessas, os eventos, as propostas, o orçamento, fechar o ano. As abas são liberadas aos poucos (Montar, Congresso, Povo e Previsões a partir do ano 2, com uma dica cada).
 - **Futuro:** modo tutorial no menu principal, com mandato guiado do começo ao fim e cenários de treino (ex.: "Enfrentar uma enchente", "Destravar o Congresso", "Fechar as contas").
 
 ### Linguagem

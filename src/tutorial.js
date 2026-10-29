@@ -53,15 +53,16 @@ const PASSOS = [
   { id: "fechar", espera: "balanco", alvo: "#gov-foot",
     texto: () => `Quando estiver satisfeito, feche o ano. Aí a gente vê o que aconteceu com o país.` },
   { id: "balanco", espera: "continuar", modal: true,
-    texto: () => `Esse é o balanço do ano: como cada termômetro mudou e por quê. No fim, vem o boletim de previsões do ano que vem. Leia com atenção: dá para se preparar.` },
+    texto: () => `Fim de ano é dia de jornal. Primeiro, as manchetes do Diário da Alvorada. Depois, o que cinco brasileiros, um de cada região, acharam das suas decisões, e os termômetros do país. Sua aprovação é a soma de oito grupos da sociedade: o que agrada a um pode irritar outro. No fim, vem o boletim de previsões do ano que vem.` },
   { id: "tchau", espera: "continuar", modal: true,
-    texto: () => `Daqui para frente é com você. Liberei três abas novas: <b>Montar</b>, para criar seus próprios projetos; <b>Congresso</b>, para negociar apoio; e <b>Previsões</b>. Qualquer termo sublinhado, é só tocar que eu explico. Bom mandato, presidente.` }
+    texto: () => `Daqui para frente é com você. Liberei quatro abas novas: <b>Montar</b>, para criar seus próprios projetos; <b>Congresso</b>, para negociar apoio; <b>Povo</b>, para ver o que cada grupo quer; e <b>Previsões</b>. Qualquer termo sublinhado, é só tocar que eu explico. Bom mandato, presidente.` }
 ];
 
 /* Dicas que aparecem uma vez, na primeira visita a cada aba */
 const DICAS = {
   montar: `Aqui você monta seu próprio projeto, escolhendo área, tipo, tamanho e lugar. Obras demoram e deixam custo fixo; transferências agem rápido, mas só valem naquele ano. O mesmo dinheiro rende mais onde a necessidade é maior.`,
   congresso: `Projetos grandes, leis e gastos além do orçamento passam por votação. Quanto mais apoio, mais chance. Dá para negociar, mas tudo tem preço. Isso tem nome: ${termo("coalizao", "presidencialismo de coalizão")}.`,
+  povo: `Esses são os oito grupos que formam a sua aprovação, e cinco brasileiros que vão te contar, todo fim de ano, como sentiram as suas decisões. Antes de aprovar um projeto, olhe no cartão quem ele agrada e quem ele desagrada.`,
   previsoes: `Este é o boletim de previsões para o ano. Ele tem margem de erro. Investir em ciência e monitoramento (Meio ambiente, contratar, Brasil todo) deixa as previsões mais precisas.`
 };
 
@@ -108,9 +109,10 @@ export function criarTutorial({ root, mapa, ui }) {
     }
     coach.style.left = x + "px"; coach.style.top = y + "px"; coach.style.bottom = "auto";
   }
+  let alvoDica = null;   // dicas das abas (fora do tutorial) apontam para o painel
   function destacar() {
     limparDestaque();
-    if (!e || !st().ativo || coach.hidden) { posicionar(null); return; }
+    if (!e || !st().ativo || coach.hidden) { posicionar(coach.hidden ? null : alvoDica); return; }
     const p = passo();
     const el = p && p.alvo ? document.querySelector(p.alvo) : null;
     if (el) el.classList.add("destaque");
@@ -191,7 +193,7 @@ export function criarTutorial({ root, mapa, ui }) {
     comecar(ativo) { st().ativo = ativo; st().passo = 0; if (ativo) mostrar(); },
     retomar() { if (st().ativo) mostrar(); },
     ativo: () => !!(e && st().ativo),
-    bloqueadas: () => (e && st().ativo ? ["montar", "congresso", "previsoes"] : []),
+    bloqueadas: () => (e && st().ativo ? ["montar", "congresso", "povo", "previsoes"] : []),
     /* avisos vindos da interface */
     notificar(ev) {
       if (!e) return;
@@ -210,7 +212,8 @@ export function criarTutorial({ root, mapa, ui }) {
       st().vistos.push(aba);
       ui.salvar();
       balao(DICAS[aba], `<button type="button" class="btn" data-tut="ok">Entendi</button>`);
-      requestAnimationFrame(() => posicionar(document.querySelector("#gov-body")));
+      alvoDica = document.querySelector("#gov-body");
+      requestAnimationFrame(() => posicionar(alvoDica));
     },
     fecharBalao() { if (!st().ativo) coach.hidden = true; },
     preencherModal

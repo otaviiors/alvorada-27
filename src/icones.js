@@ -47,6 +47,7 @@ export const ICONES = {
   i_divida:      { nome: "Dívida pública", cor: "#8a5bb0", d: "M12 4c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3z M4 7v5c0 1.7 3.6 3 8 3s8-1.3 8-3V7 M4 12v5c0 1.7 3.6 3 8 3s8-1.3 8-3v-5" },
   i_mvi:         { nome: "Segurança", cor: "#4b4e8a", d: "M12 2.5l8 3v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6z" },
   i_desmatamento:{ nome: "Desmatamento", cor: "#2f7d4f", d: "M12 21v-5 M12 3l7 10H5z M12 7l6 8.5H6z" },
+  i_povo:        { nome: "Povo", cor: "#d3784e", d: "M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6 M16 11a2.5 2.5 0 1 0 0-5 M17.5 14.2c2 .6 3.5 2.6 3.5 4.8" },
   i_aprovacao:   { nome: "Aprovação", cor: "#e0952f", d: "M7 11v9H4v-9z M7 11l4-7c1.5 0 2.5 1 2.5 2.5V10h5.2a2 2 0 0 1 2 2.4l-1.4 6A2 2 0 0 1 17.3 20H7" },
   i_congresso:   { nome: "Apoio no Congresso", cor: "#4b6aa8", d: "M3 20h18 M5 11v7 M9.5 11v7 M14.5 11v7 M19 11v7 M2.5 10h19L12 4z" },
   i_dinheiro:    { nome: "Orçamento", cor: "#3b8a5a", d: "M12 2.5v19 M16.5 6.5H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6H7" },
