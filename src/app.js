@@ -1,6 +1,9 @@
-/* Alvorada 27 — protótipo 0.3: o Brasil como maquete de relevo sobre o mapa antigo */
+/* Alvorada 27 — protótipo 0.4: maquete de relevo no mar, municípios, ícones de economia */
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { createAmbiente } from "./ambiente.js";
+import { ICONES, ECONOMIA_UF, iconSVG, iconCanvas } from "./icones.js";
 
 /* ============ Constantes ============ */
 const LON0 = -53.5, LAT0 = -14.5, KX = Math.cos(14.5 * Math.PI / 180);
@@ -8,6 +11,7 @@ const px = lon => (lon - LON0) * KX;      // x no plano da forma (leste +)
 const py = lat => (lat - LAT0);           // y no plano da forma (norte +)
 const TOP = 1.2;                          // espessura do bloco de terra
 const EXAG = 1.1;                         // altura máxima do relevo sobre o bloco
+const SEA = 0.45;                         // nível do mar
 const FOV = 30;
 const MOBILE = () => window.matchMedia("(max-width: 760px)").matches;
 const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -61,7 +65,8 @@ const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 /* ============ Estado do app ============ */
 const S = window.__a27 = {
   data: null, geo: null, ranks: {}, layer: "natureza", mood: 0.8,
-  selected: null, hover: null, states: {}, overviewDist: 80, needShadow: true
+  selected: null, hover: null, states: {}, overviewDist: 80, needShadow: true,
+  coast: [], towns: [], showIcons: true, hud: true, started: false
 };
 
 /* ============ Geometria ============ */
@@ -189,87 +194,8 @@ function soilTexture() {
   t.anisotropy = 4;
   return t;
 }
-function paperTexture() {
-  const N = 2048, c = document.createElement("canvas"); c.width = c.height = N;
-  const g = c.getContext("2d"), r = rng(21);
-  g.fillStyle = "#e6d3ab"; g.fillRect(0, 0, N, N);
-  // manchas e fibras do papel
-  for (let k = 0; k < 220; k++) {
-    const x = r() * N, y = r() * N, rad = 30 + r() * 180;
-    const gr = g.createRadialGradient(x, y, 0, x, y, rad);
-    const dark = r() > 0.5;
-    gr.addColorStop(0, dark ? "rgba(150,110,60,0.10)" : "rgba(255,245,220,0.12)");
-    gr.addColorStop(1, "rgba(0,0,0,0)");
-    g.fillStyle = gr; g.beginPath(); g.arc(x, y, rad, 0, Math.PI * 2); g.fill();
-  }
-  for (let k = 0; k < 26000; k++) {
-    const v = Math.floor(r() * 50);
-    g.fillStyle = `rgba(${120 + v},${90 + v},${50 + v},0.10)`;
-    g.fillRect(r() * N, r() * N, 1 + r() * 2, 1);
-  }
-  // world -> pixel: a folha tem 160 unidades e está centrada na origem
-  const W = x => (x + 80) / 160 * N, Z = z => (z + 80) / 160 * N;
-  // grade de paralelos e meridianos a cada 5 graus
-  g.strokeStyle = "rgba(110,80,45,0.22)"; g.lineWidth = 1.5;
-  for (let lon = -90; lon <= -20; lon += 5) { const x = W(px(lon)); g.beginPath(); g.moveTo(x, 0); g.lineTo(x, N); g.stroke(); }
-  for (let lat = -50; lat <= 20; lat += 5) { const y = Z(-py(lat)); g.beginPath(); g.moveTo(0, y); g.lineTo(N, y); g.stroke(); }
-  // Equador e Trópico de Capricórnio, tracejados
-  g.setLineDash([18, 12]); g.lineWidth = 2.5; g.strokeStyle = "rgba(120,70,35,0.45)";
-  [[0, "EQUADOR"], [-23.44, "TRÓPICO DE CAPRICÓRNIO"]].forEach(([lat, nome]) => {
-    const y = Z(-py(lat)); g.beginPath(); g.moveTo(0, y); g.lineTo(N, y); g.stroke();
-    g.save(); g.setLineDash([]); g.fillStyle = "rgba(110,70,35,0.6)"; g.font = "italic 26px Georgia, serif";
-    g.fillText(nome, W(19), y - 10); g.restore();
-  });
-  g.setLineDash([]);
-  // rosa dos ventos no Atlântico
-  const cx = W(19.5), cy = Z(15.5), R = 110;
-  g.save(); g.translate(cx, cy);
-  g.strokeStyle = "rgba(100,65,30,0.7)"; g.lineWidth = 2;
-  g.beginPath(); g.arc(0, 0, R * 0.62, 0, Math.PI * 2); g.stroke();
-  g.beginPath(); g.arc(0, 0, R * 0.7, 0, Math.PI * 2); g.stroke();
-  for (let i = 0; i < 8; i++) {
-    const a = i * Math.PI / 4, long = i % 2 === 0, L = long ? R : R * 0.6;
-    g.fillStyle = i % 2 === 0 ? "rgba(120,60,30,0.75)" : "rgba(180,140,80,0.7)";
-    g.beginPath(); g.moveTo(Math.cos(a) * L, Math.sin(a) * L);
-    g.lineTo(Math.cos(a + 0.22) * 18, Math.sin(a + 0.22) * 18); g.lineTo(0, 0);
-    g.lineTo(Math.cos(a - 0.22) * 18, Math.sin(a - 0.22) * 18); g.closePath(); g.fill();
-  }
-  g.fillStyle = "rgba(90,55,25,0.85)"; g.font = "bold 30px Georgia, serif"; g.textAlign = "center";
-  g.fillText("N", 0, -R - 12);
-  g.restore();
-  // nomes dos oceanos
-  g.fillStyle = "rgba(95,60,30,0.55)"; g.textAlign = "center";
-  g.font = "italic 44px Georgia, serif";
-  g.save(); g.translate(W(21), Z(1)); g.rotate(-1.25); g.fillText("OCEANO ATLÂNTICO", 0, 0); g.restore();
-  g.save(); g.translate(W(-28), Z(14)); g.rotate(1.25); g.fillText("OCEANO PACÍFICO", 0, 0); g.restore();
-  // rotas de navegação tracejadas
-  g.strokeStyle = "rgba(120,75,40,0.35)"; g.lineWidth = 2; g.setLineDash([10, 10]);
-  g.beginPath(); g.moveTo(W(30), Z(-24)); g.bezierCurveTo(W(26), Z(-14), W(30), Z(2), W(21), Z(9)); g.stroke();
-  g.beginPath(); g.moveTo(W(34), Z(20)); g.bezierCurveTo(W(28), Z(26), W(18), Z(30), W(6), Z(28)); g.stroke();
-  g.setLineDash([]);
-  // escurece as bordas da folha
-  const vg = g.createRadialGradient(N / 2, N / 2, N * 0.25, N / 2, N / 2, N * 0.72);
-  vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(90,55,20,0.45)");
-  g.fillStyle = vg; g.fillRect(0, 0, N, N);
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
-  return t;
-}
-function cloudTexture() {
-  const c = document.createElement("canvas"); c.width = 256; c.height = 128;
-  const g = c.getContext("2d");
-  const r = rng(3);
-  for (let k = 0; k < 14; k++) {
-    const x = 40 + r() * 176, y = 50 + r() * 40, rad = 22 + r() * 30;
-    const gr = g.createRadialGradient(x, y, 0, x, y, rad);
-    gr.addColorStop(0, "rgba(255,255,255,0.9)"); gr.addColorStop(0.6, "rgba(255,255,255,0.45)"); gr.addColorStop(1, "rgba(255,255,255,0)");
-    g.fillStyle = gr; g.beginPath(); g.arc(x, y, rad, 0, Math.PI * 2); g.fill();
-  }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
-}
-
 /* ============ Cena ============ */
-let renderer, scene, camera, controls, sun, hemi, paper, paperMat, cloudSprites = [];
+let renderer, scene, camera, controls, sun, hemi, amb;
 const raycaster = new THREE.Raycaster();
 const slabMeshes = [];
 
@@ -287,12 +213,12 @@ function initScene() {
   stage.appendChild(renderer.domElement);
 
   scene = new THREE.Scene();
-  scene.background = new THREE.Color("#cdb68b");
-  scene.fog = new THREE.Fog("#cdb68b", 90, 260);
+  scene.background = new THREE.Color("#1d4c66");
+  scene.fog = new THREE.Fog("#1d4c66", 90, 260);
 
   camera = new THREE.PerspectiveCamera(FOV, stage.clientWidth / stage.clientHeight, 0.5, 600);
 
-  hemi = new THREE.HemisphereLight("#fff3dc", "#7a5a38", 1.0);
+  hemi = new THREE.HemisphereLight("#e8f2fb", "#6a5238", 1.0);
   scene.add(hemi);
   sun = new THREE.DirectionalLight("#ffdcae", 2.8);
   sun.position.set(-26, 30, 16);
@@ -302,11 +228,6 @@ function initScene() {
   Object.assign(sun.shadow.camera, { left: -28, right: 28, top: 28, bottom: -28, near: 1, far: 120 });
   sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.03;
   scene.add(sun); scene.add(sun.target);
-
-  paperMat = new THREE.MeshStandardMaterial({ map: paperTexture(), roughness: 0.95, color: "#ffffff" });
-  paper = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), paperMat);
-  paper.rotation.x = -Math.PI / 2; paper.receiveShadow = true;
-  scene.add(paper);
 
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableRotate = false;
@@ -444,6 +365,7 @@ function buildStates() {
           wallIdx.push(wb, wb + 1, wb + 2, wb + 2, wb + 1, wb + 3);
           acc += seg;
           borderSegs.push(ax, ha + 0.012, az, bx, hb + 0.012, bz);
+          S.coast.push(ax, SEA + 0.006, az, bx, SEA + 0.006, bz);
         }
       }
       flatShapes.push(new THREE.Shape(contour));
@@ -507,7 +429,7 @@ function buildTrees() {
       if (noise2(lon * 1.3 + 9, lat * 1.3) < -0.08 && b.dens < 20) continue;
       if (!inPolys(lon, lat, st.polys)) continue;
       const x = px(lon), z = -py(lat);
-      if (Math.hypot(x - capX, z - capZ) < cityR) continue;
+      if (Math.hypot(x - capX, z - capZ) < cityR || nearTown(x, z)) continue;
       pts.push([x, z, heightAt(lon, lat)]);
     }
     if (!pts.length) continue;
@@ -589,6 +511,111 @@ function buildCities() {
   }
 }
 
+/* ---------- Municípios em miniatura (Censo 2022) ---------- */
+function houseGeometry() {
+  const body = new THREE.BoxGeometry(1, 0.7, 1); body.translate(0, 0.35, 0);
+  const roof = new THREE.ConeGeometry(0.78, 0.55, 4); roof.rotateY(Math.PI / 4); roof.translate(0, 0.97, 0);
+  const paint = (g, hex) => {
+    const c = new THREE.Color(hex), n = g.attributes.position.count, arr = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) { arr[i * 3] = c.r; arr[i * 3 + 1] = c.g; arr[i * 3 + 2] = c.b; }
+    g.setAttribute("color", new THREE.BufferAttribute(arr, 3));
+    return g.toNonIndexed();
+  };
+  const merged = mergeGeometries([paint(body.toNonIndexed(), "#ffffff"), paint(roof.toNonIndexed(), "#c0583a")]);
+  merged.computeVertexNormals();
+  return merged;
+}
+const TOWN_GRID = new Map();
+function townKey(x, z) { return Math.round(x / 0.5) + "," + Math.round(z / 0.5); }
+function nearTown(x, z) {
+  const ix = Math.round(x / 0.5), iz = Math.round(z / 0.5);
+  for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) {
+    const l = TOWN_GRID.get((ix + a) + "," + (iz + b));
+    if (l) for (const t of l) if (Math.hypot(x - t[0], z - t[1]) < t[2] + 0.04) return true;
+  }
+  return false;
+}
+function buildTowns(mun) {
+  const house = houseGeometry();
+  const tower = new THREE.BoxGeometry(1, 1, 1); tower.translate(0, 0.5, 0);
+  const fachadas = ["#fbf4e6", "#f5e6c8", "#f1d9b5", "#e6eef2", "#f7e2a0", "#f0c9b0", "#e2eedc", "#ffffff"];
+  const vidros = ["#b9c8d4", "#a7b9c8", "#d4dde4", "#c3cfd8"];
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), pos = new THREE.Vector3(), scl = new THREE.Vector3(), col = new THREE.Color();
+  const up = new THREE.Vector3(0, 1, 0);
+  const factor = MOBILE() ? 0.6 : 1;
+  const byUF = {};
+  for (const [nome, uf, lon, lat, pop] of mun.municipios) (byUF[uf] = byUF[uf] || []).push({ nome, lon, lat, pop });
+  for (const [uf, list] of Object.entries(byUF)) {
+    const st = S.states[uf]; if (!st) continue;
+    const r = rng(uf.charCodeAt(0) * 977 + uf.charCodeAt(1) * 13);
+    const houses = [], towers = [];
+    for (const m of list) {
+      const k = Math.log10(Math.max(m.pop, 1500) / 1500);          // 0 (vilarejo) a ~3 (cidade grande)
+      const nH = Math.max(1, Math.round((1 + k * 2.4) * factor));
+      const R = 0.03 + 0.03 * k;
+      const x0 = px(m.lon), z0 = -py(m.lat);
+      for (let i = 0; i < nH; i++) {
+        const a = r() * Math.PI * 2, d = Math.sqrt(r()) * R;
+        const x = x0 + Math.cos(a) * d, z = z0 + Math.sin(a) * d;
+        houses.push({ x, z, y: heightAt(x / KX + LON0, -z + LAT0), w: 0.022 + r() * 0.014, h: 0.022 + r() * 0.016, rot: r() * Math.PI, c: fachadas[Math.floor(r() * fachadas.length)] });
+      }
+      if (m.pop > 120000) {
+        const nT = Math.min(14, Math.round(Math.sqrt(m.pop / 120000) * 3 * factor));
+        for (let i = 0; i < nT; i++) {
+          const a = r() * Math.PI * 2, d = Math.sqrt(r()) * R * 0.5;
+          const x = x0 + Math.cos(a) * d, z = z0 + Math.sin(a) * d;
+          towers.push({ x, z, y: heightAt(x / KX + LON0, -z + LAT0), w: 0.03 + r() * 0.02, h: 0.06 + r() * 0.12 * (0.5 + k / 3), c: vidros[Math.floor(r() * vidros.length)] });
+        }
+      }
+      const key = townKey(x0, z0);
+      (TOWN_GRID.get(key) || TOWN_GRID.set(key, []).get(key)).push([x0, z0, R]);
+      if (m.pop >= 250000) S.towns.push({ ...m, uf });
+    }
+    const hi = new THREE.InstancedMesh(house, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, flatShading: true }), houses.length);
+    houses.forEach((b, i) => {
+      pos.set(b.x, TOP + b.y - 0.006, b.z); q.setFromAxisAngle(up, b.rot); scl.set(b.w, b.h / 0.7, b.w * 0.85);
+      m4.compose(pos, q, scl); hi.setMatrixAt(i, m4); hi.setColorAt(i, col.set(b.c));
+    });
+    hi.castShadow = true; hi.receiveShadow = true;
+    st.group.add(hi);
+    if (towers.length) {
+      const ti = new THREE.InstancedMesh(tower, new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: 0.6 }), towers.length);
+      towers.forEach((b, i) => {
+        pos.set(b.x, TOP + b.y - 0.01, b.z); q.setFromAxisAngle(up, r()); scl.set(b.w, b.h, b.w);
+        m4.compose(pos, q, scl); ti.setMatrixAt(i, m4); ti.setColorAt(i, col.set(b.c));
+      });
+      ti.castShadow = true;
+      st.group.add(ti);
+    }
+  }
+}
+
+/* ---------- Ícones de economia (medalhões estilo SimCity) ---------- */
+const iconSprites = [];
+async function buildIcons() {
+  const texCache = {};
+  for (const [uf, list] of Object.entries(ECONOMIA_UF)) {
+    const st = S.states[uf]; if (!st) continue;
+    const [lo, la] = st.e.rotulo;
+    const size = clamp(0.32 + Math.sqrt(st.area) * 0.06, 0.38, 0.85);
+    const gap = size * 1.15;
+    for (let i = 0; i < list.length; i++) {
+      const nome = list[i];
+      if (!texCache[nome]) { const t = new THREE.CanvasTexture(await iconCanvas(nome, 128)); t.colorSpace = THREE.SRGBColorSpace; texCache[nome] = t; }
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: texCache[nome], transparent: true, depthWrite: false }));
+      const ox = (i - (list.length - 1) / 2) * gap;
+      const x = px(lo) + ox, z = -py(la) + size * 2.1 + Math.abs(ox) * -0.2;
+      const y = TOP + heightAt(x / KX + LON0, -z + LAT0) + 0.35 + size * 0.5;
+      sp.position.set(x, y, z);
+      sp.scale.set(size, size, 1);
+      sp.renderOrder = 5;
+      sp.userData = { baseY: y, ph: Math.random() * 6.28, nome };
+      st.group.add(sp);
+      iconSprites.push(sp);
+    }
+  }
+}
+
 /* ---------- Rios (fitas que acompanham o relevo) ---------- */
 function buildRivers(rios) {
   const verts = [], idx = [];
@@ -629,46 +656,31 @@ function buildRivers(rios) {
   scene.add(m);
 }
 
-/* ---------- Nuvens ---------- */
-function buildClouds() {
-  const tex = cloudTexture();
-  const r = rng(99);
-  const n = MOBILE() ? 8 : 12;
-  for (let i = 0; i < n; i++) {
-    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0.7 });
-    const sp = new THREE.Sprite(mat);
-    const w = 7 + r() * 8;
-    sp.scale.set(w, w * 0.5, 1);
-    sp.position.set(-34 + r() * 68, 6 + r() * 4, -26 + r() * 52);
-    sp.userData = { speed: 0.25 + r() * 0.5, base: 0.35 + r() * 0.35, idx: i };
-    scene.add(sp);
-    cloudSprites.push(sp);
-  }
-}
-
 /* ============ Câmera ============ */
 const BR_CENTER = new THREE.Vector3(-0.6, TOP, 0.2);
 let viewOff = { fx: 1, fy: 1 };
 
 function panelBox() {
-  const p = document.getElementById("panel");
+  const p = document.getElementById("panel"), cl = document.body.classList;
+  if (cl.contains("hud-off") || cl.contains("start-on")) return { side: 0, right: 0, bottom: 0, top: 0 };
   if (MOBILE()) {
-    const h = p.classList.contains("collapsed") ? 92 : p.offsetHeight;
-    return { side: 0, bottom: h };
+    const st = p.dataset.sheet || "open";
+    const h = st === "hidden" ? 26 : st === "peek" ? 92 : p.offsetHeight;
+    return { side: 0, right: 0, bottom: h, top: 60 };
   }
-  return { side: p.offsetWidth + 32, bottom: 0 };
+  return { side: p.offsetWidth + 32, right: 80, bottom: 0, top: 60 };
 }
 function applyViewOffset() {
   const st = document.getElementById("stage");
   const W = st.clientWidth, H = st.clientHeight;
   const pb = panelBox();
-  const top = 70;   // barra superior + camadas
-  const fullW = W + pb.side, fullH = H + pb.bottom + top;
+  const top = pb.top;   // botões do topo
+  const fullW = W + pb.side + pb.right, fullH = H + pb.bottom + top;
   camera.aspect = fullW / fullH;
-  // desloca o centro óptico para longe do painel e da barra superior
-  camera.setViewOffset(fullW, fullH, 0, pb.bottom, W, H);
+  // desloca o centro óptico para o espaço livre entre painel, trilho e botões
+  camera.setViewOffset(fullW, fullH, pb.right, pb.bottom, W, H);
   camera.updateProjectionMatrix();
-  viewOff = { fy: (H - pb.bottom - top) / fullH, fx: camera.aspect * (W - pb.side) / fullW };
+  viewOff = { fy: (H - pb.bottom - top) / fullH, fx: camera.aspect * (W - pb.side - pb.right) / fullW };
 }
 function pitchFor(dist) {
   const t = clamp((dist - 5) / (S.overviewDist - 5), 0, 1);
@@ -744,24 +756,18 @@ function applyLayer() {
   renderLegend();
 }
 
-/* ============ Humor do céu ============ */
+/* ============ Humor do país (fixo por enquanto; vai reagir ao jogo) ============ */
 function setMood(v) {
   const m = v / 100; S.mood = m;
   const L = (a, b) => new THREE.Color(a).lerp(new THREE.Color(b), m);
   sun.color.copy(L("#a7b0bb", "#ffdcae"));
-  sun.intensity = lerp(1.0, 2.8, m);
-  hemi.color.copy(L("#8a939c", "#fff3dc"));
+  sun.intensity = lerp(1.0, 2.7, m);
+  hemi.color.copy(L("#8a939c", "#e8f2fb"));
   hemi.intensity = lerp(0.6, 1.0, m);
-  const bg = L("#5d5a52", "#cdb68b");
-  scene.background.copy(bg); scene.fog.color.copy(bg);
-  paperMat.color.copy(L("#8d8a80", "#ffffff"));
+  const sky = L("#2b3540", "#1d4c66");
+  scene.background.copy(sky); scene.fog.color.copy(sky);
+  amb.seaMat.color.copy(L("#26414f", "#1f6a8a"));
   renderer.toneMappingExposure = lerp(0.85, 1.15, m);
-  cloudSprites.forEach((c, i) => {
-    c.material.color.copy(L("#6f7780", "#ffffff"));
-    c.visible = i < Math.round(lerp(cloudSprites.length, 4, m));
-  });
-  const label = m < 0.25 ? "Tempestade" : m < 0.5 ? "Nublado" : m < 0.75 ? "Parcialmente nublado" : "Céu risonho";
-  document.getElementById("mood-label").textContent = label;
   S.needShadow = true;
 }
 
@@ -781,16 +787,22 @@ function buildLabels() {
     box.appendChild(cap);
     labels.push({ el: cap, st, p: new THREE.Vector3(px(st.e.lon), TOP + heightAt(st.e.lon, st.e.lat) + 0.06, -py(st.e.lat)), kind: "cap" });
   }
+  for (const t of S.towns) {
+    const el = document.createElement("div");
+    el.className = "lb lb-mun"; el.textContent = t.nome;
+    box.appendChild(el);
+    labels.push({ el, st: S.states[t.uf], p: new THREE.Vector3(px(t.lon), TOP + heightAt(t.lon, t.lat) + 0.05, -py(t.lat)), kind: "mun" });
+  }
 }
 const _v = new THREE.Vector3();
 function updateLabels() {
   const st = document.getElementById("stage");
   const W = st.clientWidth, H = st.clientHeight;
   const dist = camera.position.distanceTo(controls.target);
-  const near = dist < S.overviewDist * 0.55;
+  const near = dist < S.overviewDist * 0.55, close = dist < S.overviewDist * 0.32;
   document.getElementById("labels").classList.toggle("near", near);
   for (const l of labels) {
-    if (l.kind === "cap" && !near) { l.el.classList.add("off"); continue; }
+    if ((l.kind === "cap" && !near) || (l.kind === "mun" && !close)) { l.el.classList.add("off"); continue; }
     _v.copy(l.p); _v.y += l.st.lift;
     _v.project(camera);
     const off = _v.z > 1 || _v.x < -1.1 || _v.x > 1.1 || _v.y < -1.1 || _v.y > 1.1;
@@ -799,6 +811,7 @@ function updateLabels() {
     const x = (_v.x * 0.5 + 0.5) * W, y = (-_v.y * 0.5 + 0.5) * H;
     l.el.style.transform = l.kind === "uf"
       ? `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%)`
+      : l.kind === "mun" ? `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -130%)`
       : `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-3px, -50%)`;
   }
 }
@@ -877,7 +890,7 @@ function renderState(uf) {
       <div class="stat"><dt>Fatia do PIB</dt><dd>${fmtDec(e.pibBilhoes / totalPib() * 100, 1)}%</dd></div>
     </dl>
     <div class="section-h">Do que vive</div>
-    <ul class="vocacao">${e.vocacao.map(v => `<li>${esc(v)}</li>`).join("")}</ul>
+    <ul class="vocacao">${e.vocacao.map((v, i) => { const ic = (ECONOMIA_UF[uf] || [])[i]; return `<li>${ic ? `<span class="vic" style="background:${ICONES[ic].cor}">${iconSVG(ic, 16, "#fff")}</span>` : ""}<span>${esc(v)}</span></li>`; }).join("")}</ul>
     <p class="note">Resumo editorial. Os números por setor (agro, indústria, serviços) entram numa próxima versão.</p>
     <p class="src">Fontes: IBGE, Censo 2022 e Contas Regionais 2023; Radar IDHM 2024 (PNUD/Ipea/FJP).</p>`;
 }
@@ -903,7 +916,8 @@ function select(uf, fromHash) {
 }
 function setLayer(layer) {
   S.layer = layer;
-  document.querySelectorAll("#layers button").forEach(b => b.classList.toggle("on", b.dataset.layer === layer));
+  document.querySelectorAll("#rail button[data-layer]").forEach(b => b.classList.toggle("on", b.dataset.layer === layer));
+  toast(LAYERS[layer].nome);
   applyLayer();
   if (!S.selected) renderPanel();
 }
@@ -939,32 +953,113 @@ function bindInput() {
     if (uf !== S.hover) { S.hover = uf; setLift(); el.style.cursor = uf ? "pointer" : ""; }
   };
 }
+/* ---------- Interface ---------- */
+let toastT = null;
+function toast(msg) {
+  if (!MOBILE()) return;            // no computador o nome aparece ao passar o mouse
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("on");
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("on"), 1400);
+}
+function buildRail() {
+  const rail = document.getElementById("rail");
+  const item = (attr, nome, label) => `<button type="button" ${attr} aria-label="${esc(label)}" style="--c:${ICONES[nome].cor}">
+      ${iconSVG(nome, 20)}<span class="tip">${esc(label)}</span></button>`;
+  rail.innerHTML = Object.keys(LAYERS).map(k => item(`data-layer="${k}"${k === S.layer ? ' class="on"' : ""}`, k, ICONES[k].nome)).join("")
+    + '<hr>' + item('data-toggle="economia" class="on" aria-pressed="true"', "economia", ICONES.economia.nome);
+}
+function setSheet(state) {
+  const p = document.getElementById("panel");
+  p.classList.remove("collapsed", "sheet-hidden");
+  if (state === "peek") p.classList.add("collapsed");
+  if (state === "hidden") p.classList.add("sheet-hidden");
+  p.dataset.sheet = state;
+  setTimeout(applyViewOffset, 360);
+}
+function bindSheet() {
+  const p = document.getElementById("panel"), grab = p.querySelector(".handle");
+  let start = null;
+  grab.addEventListener("pointerdown", ev => { start = { y: ev.clientY, t: performance.now() }; grab.setPointerCapture(ev.pointerId); });
+  grab.addEventListener("pointerup", ev => {
+    if (!start) return;
+    const dy = ev.clientY - start.y; start = null;
+    const cur = p.dataset.sheet || "open";
+    const order = ["open", "peek", "hidden"];
+    let i = order.indexOf(cur);
+    if (Math.abs(dy) < 8) i = cur === "open" ? 1 : 0;           // toque alterna
+    else if (dy > 0) i = Math.min(2, i + (dy > 180 ? 2 : 1));    // arrastou para baixo
+    else i = Math.max(0, i - (dy < -180 ? 2 : 1));               // arrastou para cima
+    setSheet(order[i]);
+  });
+}
+function setHud(on) {
+  S.hud = on;
+  document.body.classList.toggle("hud-off", !on);
+  const b = document.getElementById("hud-btn");
+  b.setAttribute("aria-label", on ? "Esconder interface" : "Mostrar interface");
+  b.classList.toggle("off", !on);
+  setTimeout(applyViewOffset, 50);
+}
+function openAbout() { const dlg = document.getElementById("about"); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); }
+function showStart(on) {
+  S.started = !on;
+  document.body.classList.toggle("start-on", on);
+  if (on) select(null, true);
+  setTimeout(() => { applyViewOffset(); if (!on && !S.selected) overview(true); }, 60);
+}
 function bindUI() {
-  document.getElementById("layers").addEventListener("click", ev => {
-    const b = ev.target.closest("button[data-layer]"); if (b) setLayer(b.dataset.layer);
+  buildRail();
+  document.getElementById("rail").addEventListener("click", ev => {
+    const b = ev.target.closest("button"); if (!b) return;
+    if (b.dataset.layer) { setLayer(b.dataset.layer); return; }
+    if (b.dataset.toggle === "economia") {
+      S.showIcons = !S.showIcons;
+      iconSprites.forEach(sp => sp.visible = S.showIcons);
+      b.classList.toggle("on", S.showIcons); b.setAttribute("aria-pressed", String(S.showIcons));
+      toast(S.showIcons ? "Ícones de economia ligados" : "Ícones de economia desligados");
+    }
   });
   document.getElementById("panel").addEventListener("click", ev => {
     const b = ev.target.closest("button[data-uf]"); if (b) { select(b.dataset.uf); return; }
     if (ev.target.closest("[data-back]")) { select(null); return; }
-    if (ev.target.closest(".handle")) {
-      document.getElementById("panel").classList.toggle("collapsed");
-      setTimeout(() => { applyViewOffset(); }, 360);
-    }
   });
+  bindSheet();
   document.getElementById("zoom").addEventListener("click", ev => {
     const b = ev.target.closest("button[data-zoom]"); if (!b) return;
     const d = camera.position.distanceTo(controls.target);
     const nd = clamp(d * (b.dataset.zoom === "in" ? 0.7 : 1.4), controls.minDistance, controls.maxDistance);
     flyTo(controls.target, nd, 500);
   });
-  const range = document.getElementById("mood-range");
-  range.addEventListener("input", () => setMood(+range.value));
+  // menu
+  const menu = document.getElementById("menu"), mbtn = document.getElementById("menu-btn");
+  const closeMenu = () => { menu.hidden = true; mbtn.setAttribute("aria-expanded", "false"); };
+  mbtn.addEventListener("click", () => { menu.hidden = !menu.hidden; mbtn.setAttribute("aria-expanded", String(!menu.hidden)); });
+  menu.addEventListener("click", ev => {
+    const b = ev.target.closest("button[data-go]"); if (!b) return;
+    closeMenu();
+    const go = b.dataset.go;
+    if (go === "inicio") showStart(true);
+    else if (go === "mapa") { showStart(false); select(null); }
+    else if (go === "hud") setHud(false);
+    else if (go === "sobre") openAbout();
+  });
+  document.addEventListener("pointerdown", ev => { if (!menu.hidden && !ev.target.closest("#menu, #menu-btn")) closeMenu(); });
+  document.getElementById("hud-btn").addEventListener("click", () => setHud(!S.hud));
+  // tela inicial
+  document.getElementById("start").addEventListener("click", ev => {
+    const b = ev.target.closest("button[data-start]"); if (!b) return;
+    if (b.dataset.start === "explorar") showStart(false);
+    if (b.dataset.start === "sobre") openAbout();
+  });
   const dlg = document.getElementById("about");
-  document.getElementById("brand").addEventListener("click", () => { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); });
-  document.addEventListener("keydown", ev => { if (ev.key === "Escape" && S.selected && !dlg.open) select(null); });
+  document.addEventListener("keydown", ev => {
+    if (ev.target.closest && ev.target.closest("input, textarea")) return;
+    if (ev.key === "Escape" && !dlg.open) { if (!menu.hidden) closeMenu(); else if (S.selected) select(null); }
+    if ((ev.key === "h" || ev.key === "H") && S.started) setHud(!S.hud);
+  });
   window.addEventListener("hashchange", () => {
     const uf = (location.hash || "").slice(1).toUpperCase();
-    if ((uf || null) !== S.selected) select(S.states[uf] ? uf : null, true);
+    if ((uf || null) !== S.selected) { if (uf && !S.started) showStart(false); select(S.states[uf] ? uf : null, true); }
   });
   window.addEventListener("resize", () => {
     const st = document.getElementById("stage");
@@ -1007,6 +1102,7 @@ function loop(hoverCheck) {
       placeCamera(tg, lerp(fly.from.d, fly.to.d, k));
       if (t >= 1) { fly = null; controls.enabled = true; }
     } else {
+      controls.enabled = S.started;
       controls.update();
       // mantém o alvo dentro do Brasil e inclina a câmera conforme a distância
       const t = controls.target;
@@ -1022,10 +1118,15 @@ function loop(hoverCheck) {
     if (moving) S.needShadow = true;
 
     const dist = camera.position.distanceTo(controls.target);
-    const cloudFade = clamp((dist - S.overviewDist * 0.3) / (S.overviewDist * 0.45), 0, 1);
-    for (const c of cloudSprites) {
-      if (!REDUCED) { c.position.x += c.userData.speed * dt; if (c.position.x > 38) c.position.x = -38; }
-      c.material.opacity = c.userData.base * cloudFade * lerp(1, 0.75, S.mood);
+    amb.update(dt, dist, S.overviewDist, S.mood);
+    if (!REDUCED) {
+      const tt = now / 1000;
+      for (const sp of iconSprites) sp.position.y = sp.userData.baseY + Math.sin(tt * 1.6 + sp.userData.ph) * 0.05;
+      // na tela inicial a câmera passeia devagar sobre o país
+      if (!S.started && !fly) {
+        controls.target.x = BR_CENTER.x + Math.sin(tt * 0.12) * 3.5;
+        controls.target.z = BR_CENTER.z + Math.sin(tt * 0.09) * 2.5;
+      }
     }
 
     if (S.needShadow) { renderer.shadowMap.needsUpdate = true; S.needShadow = false; }
@@ -1036,37 +1137,53 @@ function loop(hoverCheck) {
   requestAnimationFrame(tick);
 }
 
+/* ============ Terra ou mar? ============ */
+function isLand(x, z) {
+  const lon = x / KX + LON0, lat = -z + LAT0;
+  for (const st of Object.values(S.states)) {
+    const [x0, y0, x1, y1] = st.bbox;
+    if (lon < x0 || lon > x1 || lat < y0 || lat > y1) continue;
+    if (inPolys(lon, lat, st.polys)) return true;
+  }
+  return false;
+}
+
 /* ============ Início ============ */
 async function init() {
-  drawSun(document.getElementById("sun"), true);
+  drawSun(document.getElementById("start-sun"), true);
   drawSun(document.querySelector(".about-sun"), false);
-  const [dados, geo, rios] = await Promise.all([
+  const [dados, geo, rios, mun] = await Promise.all([
     fetch("data/estados-dados.json").then(r => r.json()),
     fetch("data/estados.geojson").then(r => r.json()),
-    fetch("data/rios.geojson").then(r => r.json())
+    fetch("data/rios.geojson").then(r => r.json()),
+    fetch("data/municipios.json").then(r => r.json())
   ]);
   S.data = dados; S.geo = geo;
   computeRanks();
-  document.getElementById("sources").innerHTML = Object.values(dados.fontes).map(s => `<li>${esc(s)}</li>`).join("");
+  document.getElementById("sources").innerHTML = [...Object.values(dados.fontes), "Municípios: " + mun.fonte].map(s => `<li>${esc(s)}</li>`).join("");
 
   await loadDEM();
   initScene();
   buildStates();
+  amb = createAmbiente({ scene, SEA, TOP, isLand, coastSegments: S.coast, mobile: MOBILE(), reduced: REDUCED });
   buildCities();
+  buildTowns(mun);
   buildTrees();
   buildRivers(rios);
-  buildClouds();
+  await buildIcons();
   buildLabels();
   applyLayer();
-  setMood(+document.getElementById("mood-range").value);
+  setMood(80);
   bindUI();
   const hoverCheck = bindInput();
-  if (MOBILE()) document.getElementById("panel").classList.add("collapsed");
+  if (MOBILE()) setSheet("peek");
+  const first = (location.hash || "").slice(1).toUpperCase();
+  showStart(!S.states[first]);
   applyViewOffset();
   overview(false);
   renderPanel();
-  const first = (location.hash || "").slice(1).toUpperCase();
   if (S.states[first]) select(first, true);
+  document.body.classList.add("ready");
   loop(hoverCheck);
 }
 

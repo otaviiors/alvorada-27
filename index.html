@@ -17,40 +17,55 @@
 } }
 </script>
 </head>
-<body>
+<body class="start-on">
 <div id="app">
   <div id="stage" aria-label="Maquete do Brasil"></div>
   <div id="labels" aria-hidden="true"></div>
 
-  <header id="topbar">
-    <button id="brand" class="brand" type="button" aria-label="Sobre o Alvorada 27">
-      <svg id="sun" viewBox="-50 -50 100 100" aria-hidden="true"></svg>
-      <span class="brand-name">Alvorada <b>27</b></span>
-    </button>
-    <div class="mood">
-      <label for="mood-range" id="mood-label">Céu risonho</label>
-      <input id="mood-range" type="range" min="0" max="100" value="80">
-    </div>
-  </header>
-
-  <nav id="layers" aria-label="Camadas do mapa">
-    <button type="button" data-layer="natureza" class="on">Natureza</button>
-    <button type="button" data-layer="regiao">Regiões</button>
-    <button type="button" data-layer="pibPerCapita">PIB per capita</button>
-    <button type="button" data-layer="idhm">IDHM</button>
-    <button type="button" data-layer="densidade">Densidade</button>
+  <button id="menu-btn" class="round hud" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <nav id="menu" hidden aria-label="Menu do jogo">
+    <button type="button" data-go="inicio">Tela inicial</button>
+    <button type="button" data-go="mapa">Explorar o mapa</button>
+    <button type="button" disabled>Governar <small>em breve</small></button>
+    <hr>
+    <button type="button" data-go="hud">Esconder interface <small>tecla H</small></button>
+    <button type="button" data-go="sobre">Sobre o Alvorada 27</button>
   </nav>
 
-  <aside id="panel" aria-live="polite">
-    <div class="handle" aria-hidden="true"></div>
+  <button id="hud-btn" class="round" type="button" aria-label="Esconder interface">
+    <svg class="eye-on" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+    <svg class="eye-off" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.1 3.9M6.6 6.6A16.6 16.6 0 0 0 2 12s3.6 7 10 7a10 10 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+  </button>
+
+  <nav id="rail" class="hud" aria-label="Camadas do mapa"></nav>
+
+  <aside id="panel" class="hud" aria-live="polite">
+    <div class="handle" role="button" tabindex="0" aria-label="Mostrar ou esconder o painel"><i></i></div>
     <div id="panel-body"><p class="eyebrow">Carregando</p><p>Montando a maquete…</p></div>
   </aside>
 
-  <div id="legend" aria-hidden="true"></div>
-  <div id="zoom" role="group" aria-label="Zoom">
+  <div id="legend" class="hud" aria-hidden="true"></div>
+  <div id="zoom" class="hud" role="group" aria-label="Zoom">
     <button type="button" data-zoom="in" aria-label="Aproximar">+</button>
     <button type="button" data-zoom="out" aria-label="Afastar">−</button>
   </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <section id="start" aria-label="Tela inicial">
+    <div class="start-inner">
+      <svg id="start-sun" viewBox="-50 -50 100 100" aria-hidden="true"></svg>
+      <h1>Alvorada <b>27</b></h1>
+      <p>O Brasil visto de cima. Entenda cada estado, o que ele produz e como vive, e descubra o tamanho do desafio de governar um país.</p>
+      <div class="start-actions">
+        <button type="button" class="btn big" data-start="explorar">Explorar o Brasil</button>
+        <button type="button" class="btn ghost big" disabled>Governar <small>em breve</small></button>
+      </div>
+      <button type="button" class="link" data-start="sobre">Por que “Alvorada 27”?</button>
+    </div>
+    <p class="start-foot">Protótipo 0.4 · dados do IBGE e do PNUD</p>
+  </section>
 
   <dialog id="about">
     <form method="dialog" class="about-inner">
@@ -61,7 +76,7 @@
       <p>A ideia nasceu num sofá em Pelotas, em outubro de 2026: e se desse para olhar o país de cima, entender cada parte e tentar fazer tudo conversar?</p>
       <h3>Fontes dos dados</h3>
       <ul id="sources"></ul>
-      <p class="small">Protótipo 0.3. Cena 3D com three.js; contornos do IBGE; rios da Natural Earth; relevo a partir de dados topográficos da NASA. Vegetação e cidades são ilustrativas.</p>
+      <p class="small">Protótipo 0.4. Cena 3D com three.js; contornos do IBGE; municípios e população do Censo 2022 (IBGE); rios da Natural Earth; relevo a partir de dados topográficos da NASA. Vegetação, casas e ícones são ilustrativos.</p>
       <button class="btn">Fechar</button>
     </form>
   </dialog>

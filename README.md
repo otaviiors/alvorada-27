@@ -12,7 +12,7 @@ Alvorada 27 é um jogo web em três atos:
 
 ## Estado atual
 
-Protótipo 0.3 do Ato 1: o Brasil como maquete de relevo sobre um mapa antigo (three.js), com relevo real exagerado, vegetação por bioma, rios, cidades em miniatura, cinco camadas (natureza, regiões, PIB per capita, IDHM, densidade), ficha por estado e o controle de "céu". Direção visual em [docs/identidade-visual.md](docs/identidade-visual.md).
+Protótipo 0.4 do Ato 1: tela inicial e o Brasil como maquete de relevo no mar (three.js), com ondas, nuvens, aves e aviões; relevo real exagerado, vegetação por bioma, rios, os 5.570 municípios em miniatura (tamanho pela população do Censo 2022), ícones de economia por estado, cinco camadas em botões laterais, ficha por estado, menu e opção de esconder a interface. Direção visual em [docs/identidade-visual.md](docs/identidade-visual.md).
 
 ## Como abrir
 
@@ -24,13 +24,16 @@ Para rodar no computador, os dados precisam ser servidos por um servidor local (
 
 ```
 index.html            página principal
-src/app.js            cena 3D, câmera e painel
+src/app.js            cena 3D, câmera, painel e interface
+src/ambiente.js       mar, ondas, nuvens, aves e aviões
+src/icones.js         ícones de economia e das camadas
 src/style.css         visual
 data/estados.geojson  contornos dos 27 estados
 data/estados-dados.json  números de cada estado, com fontes
 data/vizinhos.geojson países vizinhos (Natural Earth)
 data/rios.geojson     rios principais (Natural Earth)
 data/relevo.png       relevo da região (NASA, domínio público)
+data/municipios.json  municípios com coordenadas e população (Censo 2022)
 ```
 
 ## Fontes dos dados
@@ -39,4 +42,5 @@ data/relevo.png       relevo da região (NASA, domínio público)
 - Densidade: IBGE, Anuário Estatístico do Brasil 2024
 - PIB e PIB per capita: IBGE, Contas Regionais 2023
 - IDHM: PNUD/Ipea/FJP, Radar IDHM 2024 (Amazonas e Amapá em verificação)
+- Municípios: população do Censo 2022 (IBGE, via pacote brpop); coordenadas de kelvins/municipios-brasileiros
 - Contornos: IBGE; rios e países: Natural Earth; relevo: topografia global da NASA (domínio público)
