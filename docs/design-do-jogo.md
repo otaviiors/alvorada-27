@@ -144,17 +144,39 @@ Ideia para o futuro (o Otávio quer trazer IA para o jogo): o jogador escreve a 
 - O elenco reflete a diversidade do Brasil (regiões, gêneros, idades, origens), sem estereótipos.
 - Produção das ilustrações: a definir (ilustração própria, artista ou geração por IA com estilo fixo e revisão).
 
-## 8. Como o mapa reage — *em aberto*
+## 8. Como o mapa reage — *decidido (29/10/2026)*
 
-O que muda na maquete conforme o país vai bem ou mal.
+- **Cor das regiões:** cada indicador é uma camada; dá para ver uma região mudar de cor ao longo do mandato.
+- **Projetos aparecem construídos** na maquete, onde o jogador investiu (hospital, ferrovia, parque eólico…). No fim, a maquete mostra o legado.
+- **Eventos aparecem no lugar:** fumaça nas queimadas, rio transbordando na enchente, chão rachado na seca.
+- **Humor do país:** indo bem, céu limpo, luz dourada, cidades com mais vida; indo mal, céu nublado, cores apagadas, mar agitado. A música acompanha.
+- **Antes e depois:** no fim, um botão alterna entre o Brasil de 2027 e o do fim do mandato.
 
-## 9. Fim de partida e reflexão — *em aberto*
+## 9. Fim de partida e reflexão — *decidido (29/10/2026)*
 
-Como o mandato termina e o que o jogo devolve ao jogador.
+1. **Boletim das promessas:** as 3 prioridades de campanha, cumpridas ou não, com números.
+2. **Legado:** o que melhorou, o que piorou e **quem ficou de fora** (a região mais esquecida, o indicador mais ignorado).
+3. **Reflexão final:** texto curto montado a partir das escolhas, sem julgar certo ou errado. Ex.: "Tu priorizou crescer rápido. O Centro-Oeste prosperou; a Amazônia pagou parte da conta. Governar é escolher o que deixar para depois."
 
-## 10. Dificuldade e duração — *em aberto*
+## 10. Dificuldade e duração — *proposta*
 
-Fácil, médio e difícil; partidas curtas, médias e longas.
+Dificuldade e duração são escolhas separadas.
+
+**Duração**
+| Modo | Turnos | Ideia |
+|---|---|---|
+| Primeiro ano | 1 (2027) | Partida rápida, serve de tutorial |
+| Mandato | 4 (2027–2030) | O jogo padrão |
+| Reeleição | até 8 (2027–2034) | No fim do ano 4 há eleição, decidida pela aprovação. Reeleito, o jogador governa mais 4 anos; derrotado, a partida termina ali. (No Brasil só é permitida uma reeleição seguida.) |
+
+**Dificuldade**
+| Nível | O que muda |
+|---|---|
+| Fácil | Fatia livre do orçamento maior, Congresso mais favorável, previsões mais precisas, menos eventos ruins |
+| Normal | **O Brasil real**: números reais de partida e do orçamento |
+| Difícil | O Brasil real numa fase ruim: economia mundial em crise, Congresso hostil, previsões vagas, mais eventos |
+
+**Primeira versão jogável:** só **Normal + Mandato**. Os outros modos entram depois de testar.
 
 ## Princípios
 
