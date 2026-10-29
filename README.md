@@ -27,6 +27,10 @@ index.html            página principal
 src/app.js            cena 3D, câmera, painel e interface
 src/ambiente.js       mar, ondas, nuvens, aves e aviões
 src/icones.js         ícones de economia e das camadas
+src/jogo/regras.js    regras e números de calibragem do modo Governar
+src/jogo/motor.js     motor do jogo (sem gráfico; roda no navegador e no Node)
+scripts/simular.mjs   simula partidas com estilos diferentes
+data/jogo/inicio.json condições iniciais reais do mandato 2027
 src/style.css         visual
 data/estados.geojson  contornos dos 27 estados
 data/estados-dados.json  números de cada estado, com fontes

@@ -1,0 +1,119 @@
+{
+ "ano_inicio": 2027,
+ "nacional": {
+  "crescimento": 1.8,
+  "divida": 82.9,
+  "aprovacao": 55,
+  "congresso": 50,
+  "idhm": 0.805,
+  "desemprego": 5.4,
+  "mvi": 19.1,
+  "desmatamento": 13031,
+  "pib_trilhoes": 12.7
+ },
+ "orcamento": {
+  "total": 2576.5,
+  "obrigatorias": 2304.3,
+  "livre": 213.7,
+  "emendas": 44.8,
+  "outros_poderes": 13.7,
+  "obrigatorias_detalhe": {
+   "Previdência": 1169.3,
+   "Pessoal e encargos": 440.7,
+   "Bolsa Família": 157.1,
+   "BPC": 145.1,
+   "Abono e seguro-desemprego": 104.7,
+   "Demais": 287.4
+  }
+ },
+ "regioes": {
+  "Norte": {
+   "estados": [
+    "AC",
+    "AP",
+    "AM",
+    "PA",
+    "RO",
+    "RR",
+    "TO"
+   ],
+   "populacao": 17354884,
+   "pibBilhoes": 636.6,
+   "desemprego": 6.1,
+   "idhm": 0.767,
+   "mvi": 25.3,
+   "desmatamento": 5486
+  },
+  "Nordeste": {
+   "estados": [
+    "AL",
+    "BA",
+    "CE",
+    "MA",
+    "PB",
+    "PE",
+    "PI",
+    "RN",
+    "SE"
+   ],
+   "populacao": 54658515,
+   "pibBilhoes": 1513.1,
+   "desemprego": 7.6,
+   "idhm": 0.762,
+   "mvi": 31.6,
+   "desmatamento": 4373
+  },
+  "Sudeste": {
+   "estados": [
+    "ES",
+    "MG",
+    "RJ",
+    "SP"
+   ],
+   "populacao": 84840113,
+   "pibBilhoes": 5799.5,
+   "desemprego": 5.2,
+   "idhm": 0.826,
+   "mvi": 12.5,
+   "desmatamento": 300
+  },
+  "Sul": {
+   "estados": [
+    "PR",
+    "RS",
+    "SC"
+   ],
+   "populacao": 29937706,
+   "pibBilhoes": 1834.4,
+   "desemprego": 3.2,
+   "idhm": 0.823,
+   "mvi": 11.9,
+   "desmatamento": 0
+  },
+  "Centro-Oeste": {
+   "estados": [
+    "DF",
+    "GO",
+    "MT",
+    "MS"
+   ],
+   "populacao": 16289538,
+   "pibBilhoes": 1159.8,
+   "desemprego": 3.8,
+   "idhm": 0.82,
+   "mvi": 17.2,
+   "desmatamento": 2872
+  }
+ },
+ "fontes": {
+  "crescimento": "Tendência de 1,8% ao ano: projeção do Boletim Focus para 2026 (1,82%); o PIB cresceu 2,3% em 2025 (IBGE)",
+  "divida": "Dívida bruta do governo geral, agosto de 2026: 82,9% do PIB (Banco Central)",
+  "desemprego": "PNAD Contínua, 2º trimestre de 2026 (IBGE): Brasil 5,4%, por região",
+  "idhm": "Radar IDHM 2024 (PNUD/Ipea/FJP); média regional ponderada pela população; AM e AP sem valor publicado ficam fora da média",
+  "mvi": "Mortes violentas intencionais por 100 mil, 2025 (Anuário Brasileiro de Segurança Pública 2026: Brasil 19,1). Taxas regionais calculadas a partir das taxas estaduais de 2024 (Anuário 2025) e da variação de cada estado em 2025, ponderadas pela população do Censo 2022",
+  "desmatamento": "PRODES 2025 (Inpe): Amazônia 5.796 km² e Cerrado 7.235 km², distribuídos por região a partir dos dados por estado; parte do Cerrado sem estado informado foi atribuída ao Centro-Oeste e a MG",
+  "orcamento": "Projeto de Lei Orçamentária de 2027 (agosto de 2026)",
+  "aprovacao": "Valor fictício de começo de mandato (não usa pesquisas reais)",
+  "congresso": "Valor fictício de partida"
+ }
+}

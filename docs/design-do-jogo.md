@@ -42,7 +42,7 @@ Sete indicadores nacionais, com valores iniciais reais (fontes oficiais: IBGE, B
   - **Segurança** é sobretudo responsabilidade dos estados (polícias estaduais). O presidente age por meio da Polícia Federal, da PRF, de fundos e de integração, então seus efeitos são indiretos e lentos.
   - **Meio ambiente** cria tensões reais com o crescimento (expansão de lavoura e pasto) e também riscos ao crescimento (chuva, mercados externos, multas). O jogo mostra os dois lados.
 
-## 4. O orçamento — *proposta*
+## 4. O orçamento — *decidido (29/10/2026)*
 
 Valores reais do Projeto de Lei Orçamentária de 2027 (PLOA 2027, agosto de 2026), em R$ bilhões:
 
@@ -62,7 +62,7 @@ Valores reais do Projeto de Lei Orçamentária de 2027 (PLOA 2027, agosto de 202
 
 Pisos constitucionais já garantidos dentro do total: saúde 272,2 e educação 141,2.
 
-**Mecânica proposta:** o jogador vê o orçamento inteiro como uma barra, com 89% travado. Só a fatia livre (cerca de R$ 214 bi) é dele, gasta em **projetos** (ver seção 5). Gastar acima da fatia é possível, mas piora as contas públicas. As emendas são gastas pelo Congresso por conta própria.
+**Mecânica:** o jogador vê o orçamento inteiro como uma barra, com 89% travado. Da fatia discricionária (R$ 214 bi), a maior parte mantém os ministérios funcionando; **R$ 70 bi por ano** ficam para projetos novos (simplificação do jogo; ver [calibragem.md](calibragem.md)). Dinheiro não usado reduz a dívida. Gastar acima da fatia é possível, mas piora as contas públicas. As emendas são gastas pelo Congresso por conta própria.
 
 ## 5. As decisões — *decidido (29/10/2026)*
 
