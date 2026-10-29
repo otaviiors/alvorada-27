@@ -4,7 +4,7 @@ Olhe o Brasil de cima, entenda cada estado e tente governar o país.
 
 Alvorada 27 é um jogo web em três atos:
 
-1. **Explorar**: mapa 2.5D do Brasil com relevo, nuvens e zoom até os estados, com dados reais em camadas.
+1. **Explorar**: o Brasil como maquete 3D, com zoom até os estados e dados reais em camadas.
 2. **Decidir**: simulador de gestão com orçamento limitado, níveis de dificuldade e duração de partida.
 3. **Refletir**: uma leitura final das escolhas do jogador.
 
