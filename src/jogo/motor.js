@@ -59,7 +59,7 @@ export function criarJogo(inicio, { semente = Date.now() % 2147483647, anos = 4 
     nac: { crescimento: n.crescimento, divida: n.divida, aprovacao: n.aprovacao, congresso: n.congresso, pibTri: n.pib_trilhoes,
            idhm: n.idhm, desemprego: n.desemprego, mvi: n.mvi, desmatamento: n.desmatamento },
     reg, caixa: 0, manutencao: 0, gastoExtra: 0, precisao: 1, cedidos: [],
-    projetos: [], eventos: [], previsoes: [], cartas: [], negociado: {}, votacoes: [],
+    projetos: [], projetosAno: [], eventos: [], previsoes: [], cartas: [], negociado: {}, votacoes: [],
     historico: [], temporarios: [], orcamento: inicio.orcamento, fontes: inicio.fontes
   };
   recalcularNacional(e);
@@ -201,13 +201,13 @@ export function resumoEfeitos(proj) {
   for (const r of regs) for (const k of Object.keys(s)) s[k] += proj.efeitos.porRegiao[r][k] || 0;
   const n = regs.length;
   const out = [];
-  const add = (ind, v, bom, fmt) => { if (Math.abs(v) > 0.0001) out.push({ ind, valor: v, bom, texto: fmt(v) }); };
-  add("Qualidade de vida", s.idh / n, s.idh > 0, v => (v > 0 ? "+" : "") + v.toFixed(3).replace(".", ",") + " IDHM");
-  add("Emprego", s.des / n, s.des < 0, v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(1).replace(".", ",") + " pt desemprego");
-  add("Segurança", s.mvi / n, s.mvi < 0, v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(0) + "% mortes violentas");
-  add("Meio ambiente", s.dsm / n, s.dsm < 0, v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(0) + "% desmatamento");
-  add("Crescimento", proj.efeitos.g, proj.efeitos.g > 0, v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(2).replace(".", ",") + " pt PIB");
-  add("Aprovação", proj.efeitos.apr, proj.efeitos.apr > 0, v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(1).replace(".", ",") + " pt");
+  const add = (ind, v, bom, fmt, min) => { if (Math.abs(v) >= min) out.push({ ind, valor: v, bom, texto: fmt(v) }); };
+  add("Qualidade de vida", s.idh / n, s.idh > 0, v => (v > 0 ? "+" : "") + v.toFixed(3).replace(".", ",") + " IDHM", 0.0005);
+  add("Emprego", s.des / n, s.des < 0, v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(1).replace(".", ",") + " pt desemprego", 0.05);
+  add("Segurança", s.mvi / n, s.mvi < 0, v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(0) + "% mortes violentas", 0.5);
+  add("Meio ambiente", s.dsm / n, s.dsm < 0, v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(0) + "% desmatamento", 0.5);
+  add("Crescimento", proj.efeitos.g, proj.efeitos.g > 0, v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(2).replace(".", ",") + " pt PIB", 0.005);
+  add("Aprovação", proj.efeitos.apr, proj.efeitos.apr > 0, v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(1).replace(".", ",") + " pt", 0.05);
   return out;
 }
 
@@ -531,15 +531,15 @@ export function relatorioFinal(e) {
 
   const total = Object.values(porArea).reduce((a, b) => a + b, 0);
   const frases = [];
-  if (total < 1) frases.push("Tu quase não usou o orçamento. O país seguiu no piloto automático, e o piloto automático também é uma escolha.");
-  else frases.push(`Tu apostou principalmente em ${AREAS[areaFoco].nome.toLowerCase()}, e a região que mais recebeu por habitante foi o ${regFavorita}.`);
+  if (total < 1) frases.push("Você quase não usou o orçamento. O país seguiu no piloto automático, e o piloto automático também é uma escolha.");
+  else frases.push(`Você apostou principalmente em ${AREAS[areaFoco].nome.toLowerCase()}, e a região que mais recebeu por habitante foi o ${regFavorita}.`);
   if (regEsquecida !== regFavorita) frases.push(`O ${regEsquecida} foi quem menos recebeu.`);
   if (piores.length) frases.push(`Pioraram: ${piores.map(x => x.nome.toLowerCase()).join(", ")}.`);
   const dDiv = e.nac.divida - e.ini.nac.divida;
   if (dDiv > 6) frases.push(`A dívida subiu ${r1(dDiv).toString().replace(".", ",")} pontos. Parte da conta ficou para o próximo governo.`);
-  if (e.manutencao > 20) frases.push(`Teus projetos deixaram R$ ${Math.round(e.manutencao)} bi por ano de custo fixo. É assim que o orçamento vai ficando travado.`);
+  if (e.manutencao > 20) frases.push(`Seus projetos deixaram R$ ${Math.round(e.manutencao)} bi por ano de custo fixo. É assim que o orçamento vai ficando travado.`);
   const cumpridas = promessas.filter(p => p.cumprida).length;
-  frases.push(cumpridas === 3 ? "Cumpriste as três promessas." : cumpridas === 0 ? "Nenhuma promessa foi cumprida." : `Cumpriste ${cumpridas} de 3 promessas.`);
+  frases.push(cumpridas === 3 ? "Você cumpriu as três promessas." : cumpridas === 0 ? "Nenhuma promessa foi cumprida." : `Você cumpriu ${cumpridas} de 3 promessas.`);
   frases.push("Governar é escolher o que deixar para depois.");
 
   return { promessas, indicadores: ind, porRegiao: perCap, porArea, regEsquecida, regFavorita, areaFoco, areaIgnorada, reflexao: frases, manutencao: e.manutencao };

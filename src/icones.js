@@ -29,7 +29,30 @@ export const ICONES = {
   pibPerCapita: { nome: "PIB per capita", cor: "#3b8a5a", d: "M12 2.5v19 M16.5 6.5H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6H7" },
   idhm:       { nome: "Desenvolvimento humano (IDHM)", cor: "#b9475a", d: "M12 20s-7.5-4.5-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z" },
   densidade:  { nome: "Densidade demográfica", cor: "#7a5bb0", d: "M8.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M3 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6 M16 11a2.6 2.6 0 1 0 0-5.2 M15.5 14c3 0 5.5 2.4 5.5 6" },
-  economia:   { nome: "Ícones de economia", cor: "#c2553b", d: "M3 21V11l6 4v-4l6 4V6h4v15z M3 21h18" }
+  economia:   { nome: "Ícones de economia", cor: "#c2553b", d: "M3 21V11l6 4v-4l6 4V6h4v15z M3 21h18" },
+
+  /* áreas do governo (modo Governar) */
+  a_saude:       { nome: "Saúde", cor: "#d0613a", d: "M9.5 3h5v6.5H21v5h-6.5V21h-5v-6.5H3v-5h6.5z" },
+  a_educacao:    { nome: "Educação", cor: "#3f6ea0", d: "M2 9l10-5 10 5-10 5z M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5 M22 9v6" },
+  a_infra:       { nome: "Infraestrutura", cor: "#8a7f74", d: "M3 19h18 M5 19V10 M19 19V10 M3 10h18 M5 10l3.5-5h7L19 10 M10 19v-5h4v5" },
+  a_seguranca:   { nome: "Segurança", cor: "#4b4e8a", d: "M12 2.5l8 3v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6z M8.5 12l2.5 2.5 4.5-5" },
+  a_ambiente:    { nome: "Meio ambiente", cor: "#2f7d4f", d: "M12 21v-5 M12 3l7 10H5z M12 7l6 8.5H6z" },
+  a_economia:    { nome: "Economia e emprego", cor: "#c2953b", d: "M3 8h18v12H3z M8.5 8V5.5A1.5 1.5 0 0 1 10 4h4a1.5 1.5 0 0 1 1.5 1.5V8 M3 13h18" },
+  a_assistencia: { nome: "Assistência social", cor: "#b9475a", d: "M12 20s-7.5-4.5-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z M8 12h2.5l1-2 1.5 4 1-2H16" },
+
+  /* indicadores */
+  i_crescimento: { nome: "Crescimento", cor: "#3b8a5a", d: "M3 20h18 M4 16l5-5 4 3 7-8 M15 6h5v5" },
+  i_desemprego:  { nome: "Desemprego", cor: "#c2953b", d: "M3 8h18v12H3z M8.5 8V5.5A1.5 1.5 0 0 1 10 4h4a1.5 1.5 0 0 1 1.5 1.5V8" },
+  i_idhm:        { nome: "Qualidade de vida", cor: "#b9475a", d: "M12 20s-7.5-4.5-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z" },
+  i_divida:      { nome: "Dívida pública", cor: "#8a5bb0", d: "M12 4c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3z M4 7v5c0 1.7 3.6 3 8 3s8-1.3 8-3V7 M4 12v5c0 1.7 3.6 3 8 3s8-1.3 8-3v-5" },
+  i_mvi:         { nome: "Segurança", cor: "#4b4e8a", d: "M12 2.5l8 3v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6z" },
+  i_desmatamento:{ nome: "Desmatamento", cor: "#2f7d4f", d: "M12 21v-5 M12 3l7 10H5z M12 7l6 8.5H6z" },
+  i_aprovacao:   { nome: "Aprovação", cor: "#e0952f", d: "M7 11v9H4v-9z M7 11l4-7c1.5 0 2.5 1 2.5 2.5V10h5.2a2 2 0 0 1 2 2.4l-1.4 6A2 2 0 0 1 17.3 20H7" },
+  i_congresso:   { nome: "Apoio no Congresso", cor: "#4b6aa8", d: "M3 20h18 M5 11v7 M9.5 11v7 M14.5 11v7 M19 11v7 M2.5 10h19L12 4z" },
+  i_dinheiro:    { nome: "Orçamento", cor: "#3b8a5a", d: "M12 2.5v19 M16.5 6.5H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6H7" },
+  i_previsao:    { nome: "Previsões", cor: "#5aa6c9", d: "M7 18a5 5 0 1 1 1.6-9.7A6 6 0 0 1 20 11a4 4 0 0 1-1 7.9z M9 21l1-2 M13 21l1-2" },
+  i_alerta:      { nome: "Eventos", cor: "#d0613a", d: "M12 3l10 18H2z M12 10v5 M12 18h.01" },
+  i_montar:      { nome: "Montar projeto", cor: "#c2953b", d: "M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z" }
 };
 
 /* Do que cada estado vive, em ícones (mesma ordem do resumo do painel) */

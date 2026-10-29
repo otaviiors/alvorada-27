@@ -6,6 +6,8 @@ Documento vivo. Cada seção é decidida em conversa e marcada como **decidido**
 
 Prazo-alvo: primeira versão jogável até **1º de janeiro de 2027**, quando começa o novo mandato.
 
+**Estado (29/10/2026):** primeira versão jogável pronta (protótipo 0.5): promessas, eventos com previsões, cartas dos ministros, projeto próprio, Congresso, orçamento, balanço anual, fim de mandato com antes e depois no mapa. Personagens ainda com iniciais no lugar das ilustrações.
+
 ## 1. A fantasia do jogador — *decidido (29/10/2026)*
 
 - O jogador é o **presidente da República**, que assume em 1º de janeiro de 2027.

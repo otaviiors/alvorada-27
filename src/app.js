@@ -4,6 +4,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { createAmbiente } from "./ambiente.js";
 import { ICONES, ECONOMIA_UF, iconSVG, iconCanvas } from "./icones.js";
+import { criarGovernar } from "./governar.js";
 
 /* ============ Constantes ============ */
 const LON0 = -53.5, LAT0 = -14.5, KX = Math.cos(14.5 * Math.PI / 180);
@@ -663,6 +664,10 @@ let viewOff = { fx: 1, fy: 1 };
 function panelBox() {
   const p = document.getElementById("panel"), cl = document.body.classList;
   if (cl.contains("hud-off") || cl.contains("start-on")) return { side: 0, right: 0, bottom: 0, top: 0 };
+  if (gov && gov.ativo()) {
+    if (MOBILE()) return { side: 0, right: 0, bottom: gov.alturaPainel(), top: 110 };
+    return { side: gov.larguraPainel() + 32, right: 20, bottom: 0, top: 80 };
+  }
   if (MOBILE()) {
     const st = p.dataset.sheet || "open";
     const h = st === "hidden" ? 26 : st === "peek" ? 92 : p.offsetHeight;
@@ -733,12 +738,13 @@ function rampColor(v, stops) {
   return new THREE.Color(RAMP[i]).lerp(new THREE.Color(RAMP[i + 1]), t);
 }
 function applyLayer() {
-  const L = LAYERS[S.layer];
+  const L = LAYERS[S.layer] || {};
   const stops = L.campo ? quantileStops(L.campo) : null;
   const white = new THREE.Color("#ffffff");
   for (const st of Object.values(S.states)) {
     let c = null;
     if (S.layer === "regiao") c = new THREE.Color(REGIOES[st.e.regiao]);
+    else if (S.layer === "jogo") c = S.jogoCores && S.jogoCores[st.e.regiao] ? new THREE.Color(S.jogoCores[st.e.regiao]) : null;
     else if (L.campo) c = rampColor(st.e[L.campo], stops);
     const attr = st.terrain.geometry.getAttribute("color");
     const nat = st.natural, arr = attr.array;
@@ -828,6 +834,7 @@ const totalPib = () => Object.values(S.data.estados).reduce((s, e) => s + e.pibB
 
 function renderLegend() {
   const el = document.getElementById("legend");
+  if (!LAYERS[S.layer]) { el.innerHTML = ""; return; }
   el.classList.toggle("simple", !LAYERS[S.layer].campo);
   if (S.layer === "natureza") {
     el.innerHTML = '<div class="sw">' + Object.entries(BIOMAS).map(([, b]) => `<span><i style="background:${b.chao}"></i>${esc(b.nome)}</span>`).join("") + "</div>";
@@ -938,6 +945,7 @@ function bindInput() {
     const moved = Math.hypot(ev.clientX - down.x, ev.clientY - down.y);
     down = null;
     if (moved > 8) return;
+    if (gov && gov.ativo()) return;
     const uf = pick(ev);
     if (uf) select(uf === S.selected ? null : uf);
   });
@@ -955,11 +963,11 @@ function bindInput() {
 }
 /* ---------- Interface ---------- */
 let toastT = null;
-function toast(msg) {
-  if (!MOBILE()) return;            // no computador o nome aparece ao passar o mouse
+function toast(msg, sempre = false) {
+  if (!MOBILE() && !sempre) return;  // no computador o nome aparece ao passar o mouse
   const el = document.getElementById("toast");
   el.textContent = msg; el.classList.add("on");
-  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("on"), 1400);
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("on"), sempre ? 3200 : 1400);
 }
 function buildRail() {
   const rail = document.getElementById("rail");
@@ -1002,6 +1010,8 @@ function setHud(on) {
 }
 function openAbout() { const dlg = document.getElementById("about"); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); }
 function showStart(on) {
+  if (on && gov && gov.ativo()) gov.fechar();
+  if (on && gov) atualizarBotaoContinuar();
   S.started = !on;
   document.body.classList.toggle("start-on", on);
   if (on) select(null, true);
@@ -1039,7 +1049,8 @@ function bindUI() {
     closeMenu();
     const go = b.dataset.go;
     if (go === "inicio") showStart(true);
-    else if (go === "mapa") { showStart(false); select(null); }
+    else if (go === "mapa") { if (gov.ativo()) gov.fechar(); showStart(false); select(null); }
+    else if (go === "governar") abrirGovernar(false);
     else if (go === "hud") setHud(false);
     else if (go === "sobre") openAbout();
   });
@@ -1049,6 +1060,8 @@ function bindUI() {
   document.getElementById("start").addEventListener("click", ev => {
     const b = ev.target.closest("button[data-start]"); if (!b) return;
     if (b.dataset.start === "explorar") showStart(false);
+    if (b.dataset.start === "governar") abrirGovernar(false);
+    if (b.dataset.start === "continuar") abrirGovernar(true);
     if (b.dataset.start === "sobre") openAbout();
   });
   const dlg = document.getElementById("about");
@@ -1059,6 +1072,7 @@ function bindUI() {
   });
   window.addEventListener("hashchange", () => {
     const uf = (location.hash || "").slice(1).toUpperCase();
+    if (gov && gov.ativo()) return;
     if ((uf || null) !== S.selected) { if (uf && !S.started) showStart(false); select(S.states[uf] ? uf : null, true); }
   });
   window.addEventListener("resize", () => {
@@ -1122,6 +1136,7 @@ function loop(hoverCheck) {
     if (!REDUCED) {
       const tt = now / 1000;
       for (const sp of iconSprites) sp.position.y = sp.userData.baseY + Math.sin(tt * 1.6 + sp.userData.ph) * 0.05;
+      for (const sp of projSprites.values()) sp.position.y = sp.userData.baseY + Math.sin(tt * 2 + sp.userData.ph) * 0.06;
       // na tela inicial a câmera passeia devagar sobre o país
       if (!S.started && !fly) {
         controls.target.x = BR_CENTER.x + Math.sin(tt * 0.12) * 3.5;
@@ -1135,6 +1150,84 @@ function loop(hoverCheck) {
     requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
+}
+
+
+/* ============ Ponte com o modo Governar ============ */
+let gov = null;
+const projSprites = new Map();
+const iconTex = {};
+async function texIcone(nome) {
+  if (!iconTex[nome]) { const t = new THREE.CanvasTexture(await iconCanvas(nome, 128)); t.colorSpace = THREE.SRGBColorSpace; iconTex[nome] = t; }
+  return iconTex[nome];
+}
+function pontoNaRegiao(regiao, id) {
+  const sts = Object.values(S.states).filter(st => st.e.regiao === regiao).sort((a, b) => b.e.populacao - a.e.populacao);
+  const r = rng(id * 7919 + 17);
+  for (let t = 0; t < 40; t++) {
+    const st = sts[Math.floor(r() * Math.min(sts.length, 4))];
+    const [x0, y0, x1, y1] = st.bbox;
+    const lon = lerp(x0, x1, 0.2 + r() * 0.6), lat = lerp(y0, y1, 0.2 + r() * 0.6);
+    if (inPolys(lon, lat, st.polys)) return { st, lon, lat };
+  }
+  const st = sts[0]; return { st, lon: st.e.rotulo[0], lat: st.e.rotulo[1] };
+}
+function centroRegiao(regiao) {
+  let x0 = 180, y0 = 90, x1 = -180, y1 = -90;
+  for (const st of Object.values(S.states)) if (st.e.regiao === regiao) { const b = st.bbox; x0 = Math.min(x0, b[0]); y0 = Math.min(y0, b[1]); x1 = Math.max(x1, b[2]); y1 = Math.max(y1, b[3]); }
+  return { t: new THREE.Vector3(px((x0 + x1) / 2), TOP, -py((y0 + y1) / 2)), w: (x1 - x0) * KX, d: y1 - y0 };
+}
+let ultimaRegiao = null;
+const mapaAPI = {
+  colorir(cores) {
+    if (cores === undefined) { S.layer = S.layerExplorar || "natureza"; S.jogoCores = null; }
+    else if (cores === null) { if (S.layer !== "jogo") S.layerExplorar = S.layer; S.layer = "jogo"; S.jogoCores = null; }
+    else { if (S.layer !== "jogo") S.layerExplorar = S.layer; S.layer = "jogo"; S.jogoCores = cores; }
+    applyLayer();
+  },
+  humor(v) { setMood(v); },
+  voarRegiao(regiao) {
+    if (ultimaRegiao === regiao) return;
+    ultimaRegiao = regiao;
+    const c = centroRegiao(regiao);
+    flyTo(c.t, clamp(distToFit(c.w, c.d) * 1.1, 6, S.overviewDist), 1400);
+  },
+  visaoGeral() { ultimaRegiao = null; overview(true); },
+  async projetos(lista) {
+    const ids = new Set(lista.map(p => p.id));
+    for (const [id, sp] of projSprites) if (!ids.has(id)) { sp.parent && sp.parent.remove(sp); projSprites.delete(id); }
+    for (const p of lista) {
+      let sp = projSprites.get(p.id);
+      if (!sp) {
+        sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: await texIcone(p.icone), transparent: true, depthWrite: false }));
+        const { st, lon, lat } = pontoNaRegiao(p.regiao, p.id);
+        const y = TOP + heightAt(lon, lat) + 0.32;
+        sp.position.set(px(lon), y, -py(lat));
+        sp.scale.set(0.5, 0.5, 1);
+        sp.renderOrder = 6;
+        sp.userData = { baseY: y, ph: p.id };
+        st.group.add(sp);
+        projSprites.set(p.id, sp);
+      }
+      sp.material.opacity = p.pronto ? 1 : 0.55;
+      sp.scale.setScalar(p.pronto ? 0.55 : 0.42);
+    }
+  },
+  aviso(msg) { toast(msg, true); },
+  modoJogo(on) { iconSprites.forEach(sp => sp.visible = on ? false : S.showIcons); },
+  reajustar() { applyViewOffset(); }
+};
+async function abrirGovernar(continuar) {
+  if (!S.started) { document.body.classList.remove("start-on"); S.started = true; }
+  select(null, true);
+  await gov.abrir({ continuar });
+}
+function atualizarBotaoContinuar() {
+  const s = gov.salvo();
+  const b = document.querySelector('[data-start="continuar"]');
+  if (!b) return;
+  b.hidden = !(s && s.fase !== "fim");
+  if (s) b.innerHTML = `Continuar mandato <small>${s.ano}</small>`;
 }
 
 /* ============ Terra ou mar? ============ */
@@ -1174,7 +1267,9 @@ async function init() {
   buildLabels();
   applyLayer();
   setMood(80);
+  gov = criarGovernar({ mapa: mapaAPI });
   bindUI();
+  atualizarBotaoContinuar();
   const hoverCheck = bindInput();
   if (MOBILE()) setSheet("peek");
   const first = (location.hash || "").slice(1).toUpperCase();
