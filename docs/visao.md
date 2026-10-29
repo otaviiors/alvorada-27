@@ -35,6 +35,14 @@ Registradas para não se perder. Nenhuma é compromisso; todas são possibilidad
 - **Modo sandbox:** orçamento livre, sem eventos, para experimentar.
 - **Os 27 estados** como unidade de decisão, além das 5 regiões.
 
+### Inspiração: No Time to Relax (para depois das 3 entregas de engajamento)
+Jogo de tabuleiro digital por turnos que o Otávio adora jogar com os amigos, em LAN e online. O que ele gosta: **multiplayer**, **barrinhas de meta** para atingir, e **obrigações que custam tempo da rodada** (deslocamento, precisar comer), que deixam cada turno apertado e estratégico. Ideias de como trazer isso para o Alvorada 27:
+- **Agenda do presidente:** além do dinheiro, cada ano tem um número limitado de dias de agenda. Aprovar, negociar e viajar gastam dias.
+- **Obrigações:** compromissos que comem agenda e não dá para evitar (sessões no Congresso, viagens internacionais, crises), e o **descanso do presidente** como o "comer" do NTTR: quem não descansa decide pior.
+- **Viagens com peão:** um peão do presidente anda pela maquete; visitar uma região gasta dias, ganha apoio local e libera ações de lá.
+- **Barras de meta:** promessas e missões com barra de progresso sempre visível.
+- **Multiplayer:** primeiro um desafio entre amigos (todos governam o mesmo Brasil, com os mesmos eventos, e comparam a nota); depois partidas em LAN e online, talvez com cada jogador num papel (presidente, Congresso, governadores).
+
 ### Inteligência artificial no jogo
 - **Propostas em texto livre:** o jogador escreve a ideia e a IA a transforma em projeto, com as mesmas regras de custo e efeito.
 - **Notícias do mandato:** manchetes e matérias geradas a partir do que aconteceu em cada ano.
