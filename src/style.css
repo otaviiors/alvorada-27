@@ -523,3 +523,11 @@ body.gov-on #zoom { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right
   #gov.pre-posse #coach { left: 12px; transform: none; top: auto; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
   .modo { grid-template-columns: 1fr; }
 }
+
+#coach.seta-cima::before, #coach.seta-baixo::before, #coach.seta-esq::before { content: ""; position: absolute; width: 14px; height: 14px; background: #f6f1e4; transform: rotate(45deg); }
+#coach.seta-cima::before { top: -7px; left: calc(var(--sx, 50%) - 7px); }
+#coach.seta-baixo::before { bottom: -7px; left: calc(var(--sx, 50%) - 7px); }
+#coach.seta-esq::before { left: -7px; top: calc(var(--sy, 40px) - 7px); }
+.gl-vals span { grid-template-columns: 10px 1fr auto !important; }
+.gl-vals small { grid-column: 2 / -1; font: 500 10.5px var(--f-body); color: var(--nevoa); margin-top: -2px; }
+.gente-ano { background: rgba(63, 143, 90, 0.14); border-radius: 10px; padding: 10px 12px; color: #d8eedf; }

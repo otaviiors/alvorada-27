@@ -32,6 +32,8 @@ function corEscala(v, [bom, ruim]) {
   const mix = (a, b, k) => { const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); const A = p(a), B = p(b); return "#" + A.map((x, i) => Math.round(x + (B[i] - x) * k).toString(16).padStart(2, "0")).join(""); };
   return t < 0.5 ? mix(BOM, MEIO, t * 2) : mix(MEIO, RUIM, (t - 0.5) * 2);
 }
+const FORCA_TRABALHO = 110e6;   // força de trabalho aproximada (PNAD Contínua)
+const fmtGente = n => n >= 1e6 ? nf(n / 1e6, 1) + (n >= 2e6 ? " milhões" : " milhão") : n >= 1000 ? nf(Math.round(n / 1000), 0) + " mil" : nf(Math.round(n), 0);
 const iniciais = nome => nome.split(" ").filter(Boolean).map(x => x[0]).slice(0, 2).join("");
 
 export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
@@ -78,7 +80,16 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     const [a, b] = ind.escala;
     $("#gov-legend").innerHTML = `<div class="gl-t">${esc(ind.nome)}${snapshot === "inicio" ? " · " + e.anoInicial : ""}</div>
       <div class="gl-ramp"></div><div class="gl-ends"><span>${esc(ind.fmt(a))}</span><span>${esc(ind.fmt(b))}</span></div>
-      <div class="gl-vals">${REGIOES.map(r => `<span><i style="background:${cores[r]}"></i>${r}<b>${esc(ind.fmt(fonte[r][ind.regional]))}</b></span>`).join("")}</div>`;
+      <div class="gl-vals">${REGIOES.map(r => `<span><i style="background:${cores[r]}"></i>${r}<b>${esc(ind.fmt(fonte[r][ind.regional]))}</b><small>${esc(gente(ind.id, fonte, r))}</small></span>`).join("")}</div>`;
+  }
+  /* o mesmo número, em escala de gente */
+  function gente(id, fonte, r) {
+    const R = fonte[r], P = REGIOES.reduce((s, x) => s + fonte[x].populacao, 0);
+    if (id === "desemprego") return "≈ " + fmtGente(R.desemprego / 100 * FORCA_TRABALHO * R.populacao / P) + " sem trabalho";
+    if (id === "mvi") return "≈ " + fmtGente(R.mvi * R.populacao / 1e5) + " mortes/ano";
+    if (id === "desmatamento") return R.desmatamento ? "≈ " + fmtGente(R.desmatamento * 140) + " campos" : "—";
+    if (id === "idhm") return fmtGente(R.populacao) + " habitantes";
+    return "";
   }
   function humor() { mapa.humor(clamp((e.nac.aprovacao - 15) / 55 * 100, 0, 100)); }
   function sincronizarProjetos() {
@@ -168,8 +179,6 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
   }
 
   /* números traduzidos em gente */
-  const FORCA_TRABALHO = 110e6;   // força de trabalho aproximada (PNAD Contínua)
-  const fmtGente = n => n >= 1e6 ? nf(n / 1e6, 1) + " milhão" + (n >= 2e6 ? "ões" : "") : n >= 1000 ? nf(Math.round(n / 1000), 0) + " mil" : nf(Math.round(n), 0);
   function emGente(p) {
     const popTot = REGIOES.reduce((s, r) => s + e.reg[r].populacao, 0);
     let emp = 0, vidas = 0, km = 0;
@@ -305,11 +314,23 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     const d = b - a, melhor = i.melhor === "maior" ? d > 0 : d < 0, igual = Math.abs(d) < 1e-6;
     return `<tr><th>${iconSVG(i.icone, 15)} ${esc(i.nome)}</th><td>${esc(i.fmt(a))}</td><td>→</td><td><b>${esc(i.fmt(b))}</b></td><td class="${igual ? "" : melhor ? "bom" : "ruim"}">${igual ? "=" : (d > 0 ? "▲" : "▼")}</td></tr>`;
   }
+  function resumoGente(a, b) {
+    const P = REGIOES.reduce((s, r) => s + e.reg[r].populacao, 0);
+    const f = [];
+    const emp = (a.desemprego - b.desemprego) / 100 * FORCA_TRABALHO;
+    if (Math.abs(emp) >= 10000) f.push(emp > 0 ? `<b>${esc(fmtGente(emp))}</b> pessoas a mais trabalhando` : `<b>${esc(fmtGente(-emp))}</b> pessoas a mais sem emprego`);
+    const vidas = (a.mvi - b.mvi) * P / 1e5;
+    if (Math.abs(vidas) >= 50) f.push(vidas > 0 ? `<b>${esc(fmtGente(vidas))}</b> mortes violentas a menos por ano` : `<b>${esc(fmtGente(-vidas))}</b> mortes violentas a mais por ano`);
+    const km = a.desmatamento - b.desmatamento;
+    if (Math.abs(km) >= 50) f.push(km > 0 ? `<b>${esc(fmtGente(km * 140))}</b> campos de futebol de floresta a menos derrubados` : `<b>${esc(fmtGente(-km * 140))}</b> campos de futebol a mais derrubados`);
+    return f.length ? `<p class="gente-ano">Em gente: ${f.join(" · ")}.</p>` : "";
+  }
   function telaAno(rel) {
     const proximo = e.fase !== "fim";
     modal(`<p class="eyebrow">Balanço de ${rel.ano}</p>
       <h2>${rel.crescimento >= 2.5 ? "Um ano de crescimento forte." : rel.crescimento >= 1.5 ? "Um ano de crescimento moderado." : rel.crescimento >= 0 ? "Um ano de economia fraca." : "O país entrou em recessão."}</h2>
       <table class="tab-ind"><tbody>${IND.map(i => linhaInd(i, rel.antes[i.id], rel.depois[i.id])).join("")}</tbody></table>
+      ${resumoGente(rel.antes, rel.depois)}
       ${rel.eventos.length ? `<h3 class="sub">Eventos</h3><ul class="lista">${rel.eventos.map(x => `<li><b>${esc(x.nome)}</b> ${x.regiao ? "(" + esc(x.regiao) + ")" : ""}: ${esc(x.resposta || "")}</li>`).join("")}</ul>` : ""}
       ${rel.prontos.length ? `<h3 class="sub">Projetos que começaram a fazer efeito</h3><ul class="lista">${rel.prontos.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}
       ${rel.votacoes.length ? `<h3 class="sub">Votações</h3><ul class="lista">${rel.votacoes.map(v => `<li>${esc(v.nome)}: <b>${v.aprovado ? "aprovado" : "rejeitado"}</b></li>`).join("")}</ul>` : ""}

@@ -209,7 +209,7 @@ Decisões da conversa: **nota + reeleição + missões**; **cidadãos + manchete
 ### Pessoas no lugar de números
 - **Cinco cidadãos principais**, um por região, fictícios, com nome, idade, profissão, cidade e o que mais importa para eles. Cada um tem humor (feliz, neutro, preocupado) e uma fala por ano reagindo ao que aconteceu na região.
 - **Grupos da sociedade**, cada um com sua aprovação: trabalhadores, empresários, agricultores, famílias de baixa renda, jovens e estudantes, aposentados, ambientalistas, moradores das grandes cidades. Cada grupo gosta e desgosta de coisas diferentes. A aprovação nacional passa a ser a média dos grupos, e o jogador entende **quem** está satisfeito e por quê.
-- **Números traduzidos em gente:** 0,1 ponto de desemprego ≈ 110 mil pessoas; 0,1 morte por 100 mil ≈ 210 vidas por ano; 1 km² de floresta ≈ 140 campos de futebol.
+- **Números traduzidos em gente (regra fixa do projeto, 29/10/2026):** todo número mostrado ao jogador vem com uma escala visível. 0,1 ponto de desemprego ≈ 110 mil pessoas; 0,1 morte por 100 mil ≈ 210 vidas por ano; 1 km² de floresta ≈ 140 campos de futebol.
 
 ### Manchetes
 - No fim de cada ano, a capa de um jornal fictício (*Diário da Alvorada*) com 3 ou 4 manchetes geradas a partir do que aconteceu, com um pouco de humor e sem citar pessoas ou partidos reais.
