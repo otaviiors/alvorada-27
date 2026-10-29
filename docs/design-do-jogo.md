@@ -21,13 +21,46 @@ Prazo-alvo: primeira versão jogável até **1º de janeiro de 2027**, quando co
 
 **Bem enxuta**: poucas áreas e poucos números, jogável em cerca de 10 minutos. Cresce depois de testar.
 
-## 3. Os números do país — *em aberto*
+## 3. Os números do país — *decidido (29/10/2026)*
 
-Os indicadores que o jogo acompanha (ex.: crescimento, emprego, desenvolvimento humano, dívida, aprovação, apoio do Congresso) e de onde vem o valor inicial de cada um.
+Sete indicadores nacionais, com valores iniciais reais (fontes oficiais: IBGE, Banco Central, Tesouro, Inpe, Fórum Brasileiro de Segurança Pública):
 
-## 4. O orçamento — *em aberto*
+| Indicador | O que representa |
+|---|---|
+| Crescimento | PIB subindo ou caindo |
+| Emprego | Taxa de desemprego |
+| Qualidade de vida | Saúde, educação e renda, no espírito do IDHM |
+| Contas públicas | Dívida em relação ao PIB |
+| Segurança | Violência (ex.: mortes violentas por 100 mil habitantes) |
+| Meio ambiente | Desmatamento e emissões |
+| Aprovação | Apoio da população ao governo |
 
-Quanto já chega comprometido por lei, quanto sobra para decidir e em quais áreas.
+- O orçamento é distribuído entre as **5 regiões**, para que o mapa reaja e a desigualdade regional apareça. Os 27 estados entram numa versão futura.
+- Lições que esses números devem ensinar:
+  - **Segurança** é sobretudo responsabilidade dos estados (polícias estaduais). O presidente age por meio da Polícia Federal, da PRF, de fundos e de integração, então seus efeitos são indiretos e lentos.
+  - **Meio ambiente** cria tensões reais com o crescimento (expansão de lavoura e pasto) e também riscos ao crescimento (chuva, mercados externos, multas). O jogo mostra os dois lados.
+
+## 4. O orçamento — *proposta*
+
+Valores reais do Projeto de Lei Orçamentária de 2027 (PLOA 2027, agosto de 2026), em R$ bilhões:
+
+| Parte | Valor | Quem decide |
+|---|---|---|
+| Despesa primária total (limite) | 2.576,5 | — |
+| Obrigatórias | 2.304,3 (~89%) | Já definidas por lei |
+| · Previdência | 1.169,3 | |
+| · Pessoal e encargos | 440,7 | |
+| · Bolsa Família | 157,1 | |
+| · BPC | 145,1 | |
+| · Abono e seguro-desemprego | 104,7 | |
+| · Demais | 287,4 | |
+| Discricionárias do Executivo | 213,7 (~8%) | **O jogador** |
+| Emendas parlamentares | 44,8 | O Congresso |
+| Outros Poderes (Judiciário, MPU, DPU) | 13,7 | Cada Poder |
+
+Pisos constitucionais já garantidos dentro do total: saúde 272,2 e educação 141,2.
+
+**Mecânica proposta:** o jogador vê o orçamento inteiro como uma barra, com 89% travado. Só a fatia livre (cerca de R$ 214 bi) é dele, gasta em **projetos** (ver seção 5). Gastar acima da fatia é possível, mas piora as contas públicas. As emendas são gastas pelo Congresso por conta própria.
 
 ## 5. As decisões — *em aberto*
 
