@@ -187,3 +187,37 @@ Dificuldade e duração são escolhas separadas.
 - **Neutro.** Nenhum partido, nenhum candidato, nenhuma ideologia premiada. O jogo mostra custos e efeitos das escolhas e deixa o jogador decidir o que vale mais.
 - **Honesto.** Os dados de partida são reais e citados. Os efeitos das decisões vêm de um modelo simplificado, e o jogo diz isso.
 - **Ensina jogando.** Cada regra deve ensinar algo verdadeiro sobre como o Brasil é governado.
+
+## 11. Engajamento: contexto, objetivo e pessoas — *proposta (29/10/2026)*
+
+Primeiro teste do Otávio (29/10/2026): o jogo é educativo, mas faltou contexto, tutorial e um objetivo claro; foi preciso esforço para se interessar. Como ele não gosta de política, é exatamente o público a conquistar.
+
+Decisões da conversa: **nota + reeleição + missões**; **cidadãos + manchetes** (um cidadão principal por região e vários grupos secundários reagindo); **tutorial guiado no 1º ano, opcional**, e um **modo tutorial no menu** (pode ficar para o futuro); tom **equilibrado** entre política e gestão.
+
+### Nota do mandato
+- Nota de 0 a 100, mostrada como 1 a 5 estrelas, visível o tempo todo como "nota parcial".
+- Composição: promessas (30), legado comparado com o que aconteceria sem o jogador (40), equilíbrio entre as regiões (15), contas públicas (15).
+
+### Reeleição
+- No fim do ano 4 há eleição contra um adversário fictício. Os votos vêm da aprovação de cada grupo e de cada região.
+- O resultado aparece no mapa, região por região. Reeleito: bônus na nota e opção de governar mais 4 anos. Derrotado: o mandato termina ali.
+
+### Missões
+- A cada ano, 2 ou 3 missões curtas e concretas, tiradas da situação do país. Ex.: "Socorrer o Nordeste na seca sem cortar a saúde", "Aprovar um projeto de educação no Norte", "Fechar o ano sem gastar além do orçamento", "Chegar a 55 de apoio no Congresso".
+- Recompensa: pontos na nota, aprovação, apoio ou dinheiro extra no ano seguinte.
+
+### Pessoas no lugar de números
+- **Cinco cidadãos principais**, um por região, fictícios, com nome, idade, profissão, cidade e o que mais importa para eles. Cada um tem humor (feliz, neutro, preocupado) e uma fala por ano reagindo ao que aconteceu na região.
+- **Grupos da sociedade**, cada um com sua aprovação: trabalhadores, empresários, agricultores, famílias de baixa renda, jovens e estudantes, aposentados, ambientalistas, moradores das grandes cidades. Cada grupo gosta e desgosta de coisas diferentes. A aprovação nacional passa a ser a média dos grupos, e o jogador entende **quem** está satisfeito e por quê.
+- **Números traduzidos em gente:** 0,1 ponto de desemprego ≈ 110 mil pessoas; 0,1 morte por 100 mil ≈ 210 vidas por ano; 1 km² de floresta ≈ 140 campos de futebol.
+
+### Manchetes
+- No fim de cada ano, a capa de um jornal fictício (*Diário da Alvorada*) com 3 ou 4 manchetes geradas a partir do que aconteceu, com um pouco de humor e sem citar pessoas ou partidos reais.
+
+### Tutorial
+- Antes do mandato: "Primeira vez? Governar com a ajuda do gabinete" ou "Já sei jogar".
+- **Chefe de gabinete** (personagem fictício) guia o primeiro ano passo a passo: o país herdado, as promessas, os eventos, as propostas, o orçamento, fechar o ano. As abas são liberadas aos poucos (Montar, Congresso e Previsões a partir do ano 2, com uma dica cada).
+- **Futuro:** modo tutorial no menu principal, com mandato guiado do começo ao fim e cenários de treino (ex.: "Enfrentar uma enchente", "Destravar o Congresso", "Fechar as contas").
+
+### Linguagem
+- Equilíbrio: a parte política continua (é o que o jogo ensina de mais valioso), mas sem jargão solto. Todo termo técnico ganha explicação curta ao tocar (ex.: IDHM, discricionárias, emendas).
