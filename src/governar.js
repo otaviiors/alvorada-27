@@ -6,6 +6,7 @@ import {
   REGIOES, AREAS, TIPOS, TAMANHOS, PROMESSAS, CAMARA, NEGOCIACOES, ORCAMENTO
 } from "./jogo/motor.js";
 import { iconSVG, ICONES } from "./icones.js";
+import { criarTutorial, termo } from "./tutorial.js";
 
 const CHAVE = "alvorada27-mandato";
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -17,13 +18,13 @@ const AREA_ICONE = { saude: "a_saude", educacao: "a_educacao", infra: "a_infra",
 
 /* Indicadores mostrados no topo. regional: dá para pintar o mapa por região */
 const IND = [
-  { id: "crescimento", nome: "Crescimento", icone: "i_crescimento", fmt: v => nf(v) + "%", melhor: "maior" },
-  { id: "desemprego", nome: "Desemprego", icone: "i_desemprego", fmt: v => nf(v) + "%", melhor: "menor", regional: "desemprego", escala: [3, 9] },
-  { id: "idhm", nome: "Qualidade de vida (IDHM)", icone: "i_idhm", fmt: v => nf(v, 3), melhor: "maior", regional: "idhm", escala: [0.85, 0.74] },
-  { id: "divida", nome: "Dívida (% do PIB)", icone: "i_divida", fmt: v => nf(v) + "%", melhor: "menor" },
-  { id: "mvi", nome: "Mortes violentas (por 100 mil)", icone: "i_mvi", fmt: v => nf(v), melhor: "menor", regional: "mvi", escala: [8, 35] },
-  { id: "desmatamento", nome: "Desmatamento (km²/ano)", icone: "i_desmatamento", fmt: v => nf(v, 0), melhor: "menor", regional: "desmatamento", escala: [0, 6000] },
-  { id: "aprovacao", nome: "Aprovação", icone: "i_aprovacao", fmt: v => Math.round(v) + "%", melhor: "maior" }
+  { id: "crescimento", nome: "Crescimento", icone: "i_crescimento", fmt: v => nf(v) + "%", melhor: "maior", dica: "Quanto a economia cresceu no ano" },
+  { id: "desemprego", nome: "Desemprego", icone: "i_desemprego", fmt: v => nf(v) + "%", melhor: "menor", regional: "desemprego", escala: [3, 9], dica: "0,1 ponto ≈ 110 mil pessoas" },
+  { id: "idhm", nome: "Qualidade de vida (IDHM)", icone: "i_idhm", fmt: v => nf(v, 3), melhor: "maior", regional: "idhm", escala: [0.85, 0.74], dica: "Saúde, estudo e renda, de 0 a 1" },
+  { id: "divida", nome: "Dívida (% do PIB)", icone: "i_divida", fmt: v => nf(v) + "%", melhor: "menor", dica: "Quanto o governo deve, perto do que o país produz" },
+  { id: "mvi", nome: "Mortes violentas (por 100 mil)", icone: "i_mvi", fmt: v => nf(v), melhor: "menor", regional: "mvi", escala: [8, 35], dica: "0,1 a menos ≈ 200 vidas por ano" },
+  { id: "desmatamento", nome: "Desmatamento (km²/ano)", icone: "i_desmatamento", fmt: v => nf(v, 0), melhor: "menor", regional: "desmatamento", escala: [0, 6000], dica: "1 km² ≈ 140 campos de futebol" },
+  { id: "aprovacao", nome: "Aprovação", icone: "i_aprovacao", fmt: v => Math.round(v) + "%", melhor: "maior", dica: "Quanto da população aprova o governo" }
 ];
 const BOM = "#3f8f5a", RUIM = "#b8452f", MEIO = "#e2b84a";
 function corEscala(v, [bom, ruim]) {
@@ -50,6 +51,13 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     <div id="gov-modal" hidden><div class="gm-box" role="dialog" aria-modal="true"></div></div>`;
   document.getElementById("app").appendChild(root);
   const $ = s => root.querySelector(s);
+  const tut = criarTutorial({ root, mapa, ui: {
+    indicador(id) { indMapa = id; if (e) { renderTopo(); pintarMapa(); } },
+    aba(id) { aba = id; renderAbas(); renderCorpo(); renderRodape(); abrirPainel(); },
+    promessas: () => telaPromessas(),
+    salvar: () => salvar(),
+    render: () => render()
+  } });
 
   /* ---------- salvar ---------- */
   const salvar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(e)); } catch (_) { /* sem armazenamento */ } };
@@ -88,7 +96,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
         const d = v - v0, melhor = i.melhor === "maior" ? d > 0 : d < 0;
         const seta = Math.abs(d) < 1e-6 || i.id === "crescimento" ? "" : `<em class="${melhor ? "bom" : "ruim"}">${d > 0 ? "▲" : "▼"}</em>`;
         return `<button type="button" class="gt-ind${indMapa === i.id ? " on" : ""}${i.regional ? " reg" : ""}" data-ind="${i.id}" title="${esc(i.nome)}${i.regional ? " — toque para ver no mapa" : ""}">
-          ${iconSVG(i.icone, 16)}<span class="v">${esc(i.fmt(v))}</span>${seta}<span class="tip">${esc(i.nome)}<br><small>Início: ${esc(i.fmt(v0))}</small></span></button>`;
+          ${iconSVG(i.icone, 16)}<span class="v">${esc(i.fmt(v))}</span>${seta}<span class="tip">${esc(i.nome)}<br><small>${esc(i.dica)}<br>Início: ${esc(i.fmt(v0))}${i.regional ? " · toque para ver no mapa" : ""}</small></span></button>`;
       }).join("")}</div>
       ${fim ? `<div class="gt-snap" role="group" aria-label="Comparar"><button type="button" data-snap="inicio" class="${snapshot === "inicio" ? "on" : ""}">${e.anoInicial}</button><button type="button" data-snap="agora" class="${snapshot === "agora" ? "on" : ""}">${e.anoFinal}</button></div>`
         : ""}${fim ? `<button type="button" class="btn ghost gt-bal" data-acao="ver-balanco">Balanço</button>` : ""}${fim ? "" : `<div class="gt-caixa" title="Dinheiro para projetos novos neste ano">${iconSVG("i_dinheiro", 16)}<span><b>${esc(bi(e.caixa))}</b><small>para projetos</small></span></div>`}`;
@@ -105,7 +113,8 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
   ];
   function renderAbas() {
     const pend = eventosPendentes(e).length;
-    $("#gov-tabs").innerHTML = ABAS.map(a => `<button type="button" role="tab" data-aba="${a.id}" aria-selected="${aba === a.id}" class="${aba === a.id ? "on" : ""}">
+    const bloq = tut.bloqueadas();
+    $("#gov-tabs").innerHTML = ABAS.filter(a => !bloq.includes(a.id)).map(a => `<button type="button" role="tab" data-aba="${a.id}" aria-selected="${aba === a.id}" class="${aba === a.id ? "on" : ""}">
       ${iconSVG(a.icone, 16)}<span>${a.nome}</span>${a.id === "eventos" && pend ? `<b class="badge">${pend}</b>` : ""}</button>`).join("");
   }
   function renderCorpo() {
@@ -126,8 +135,10 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
       : `<button type="button" class="btn wide" data-acao="fechar">Fechar o ano de ${e.ano} →</button>`;
   }
   function render() {
+    root.classList.toggle("pre-posse", e.fase === "promessas");
     renderTopo(); renderAbas(); renderCorpo(); renderRodape();
     pintarMapa(); humor(); sincronizarProjetos();
+    tut.aposRender();
   }
 
   /* ---------- cartões de projeto ---------- */
@@ -146,13 +157,34 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
       <dl class="pj-num">
         <div><dt>Custo</dt><dd>${esc(bi(p.custo))}</dd></div>
         <div><dt>Efeito</dt><dd>${p.prazo === 0 ? "neste ano" : p.prazo === 1 ? "em 1 ano" : `em ${p.prazo} anos`}</dd></div>
-        <div><dt>Custo fixo depois</dt><dd>${p.manutencao ? esc(bi(p.manutencao)) + "/ano" : "nenhum"}</dd></div>
+        <div><dt>${termo("manutencao", "Custo fixo")} depois</dt><dd>${p.manutencao ? esc(bi(p.manutencao)) + "/ano" : "nenhum"}</dd></div>
       </dl>
       <ul class="pj-ef">${ef.map(x => `<li class="${x.bom ? "bom" : "ruim"}"><span>${esc(x.ind)}</span><b>${esc(x.texto)}</b></li>`).join("") || "<li>Efeito pequeno</li>"}</ul>
+      ${emGente(p)}
       ${p.temporario ? `<p class="pj-nota">Transferência: o efeito vale só neste ano.</p>` : ""}
       ${voto ? `<p class="pj-voto">${iconSVG("i_congresso", 14)} Precisa de votação${extra ? " (crédito além do orçamento)" : ""}: <b>${chance}% de chance</b></p>` : ""}
       ${estado ? `<p class="pj-estado ${estado.ok ? "ok" : "nao"}">${esc(estado.texto)}</p>` : acao ? `<button type="button" class="btn ${extra ? "ghost" : ""} wide" ${acao}>${extra ? "Aprovar com dinheiro extra" : "Aprovar"}</button>` : ""}
     </article>`;
+  }
+
+  /* números traduzidos em gente */
+  const FORCA_TRABALHO = 110e6;   // força de trabalho aproximada (PNAD Contínua)
+  const fmtGente = n => n >= 1e6 ? nf(n / 1e6, 1) + " milhão" + (n >= 2e6 ? "ões" : "") : n >= 1000 ? nf(Math.round(n / 1000), 0) + " mil" : nf(Math.round(n), 0);
+  function emGente(p) {
+    const popTot = REGIOES.reduce((s, r) => s + e.reg[r].populacao, 0);
+    let emp = 0, vidas = 0, km = 0;
+    for (const [r, x] of Object.entries(p.efeitos.porRegiao)) {
+      const pop = e.reg[r].populacao;
+      if (x.des) emp += -x.des / 100 * FORCA_TRABALHO * pop / popTot;
+      if (x.mvi) vidas += -x.mvi / 100 * e.reg[r].mvi * pop / 1e5;
+      if (x.dsm) km += -x.dsm / 100 * e.reg[r].desmatamento;
+    }
+    const f = [];
+    if (emp >= 1000) f.push(`≈ ${fmtGente(emp)} pessoas a mais trabalhando`);
+    if (vidas >= 10) f.push(`≈ ${fmtGente(vidas)} vidas salvas por ano`);
+    if (km >= 10) f.push(`≈ ${fmtGente(km * 140)} campos de futebol de floresta preservados por ano`);
+    if (km <= -10) f.push(`≈ ${fmtGente(-km * 140)} campos de futebol a mais desmatados por ano`);
+    return f.length ? `<p class="pj-gente">${f.map(esc).join(" · ")}</p>` : "";
   }
 
   /* ---------- abas: conteúdo ---------- */
@@ -201,7 +233,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
   function abaCongresso() {
     const c = e.nac.congresso;
     const fala = c >= 65 ? "A base está firme, presidente. Dá para votar o que for preciso." : c >= 45 ? "Tem votos, mas cada um tem seu preço." : "Do jeito que está, nada passa nesta Casa.";
-    return `<p class="intro">Quase nunca um presidente tem maioria sozinho. Para aprovar leis, projetos grandes e gastos extras, é preciso montar uma coalizão. Os cientistas políticos chamam isso de <b>presidencialismo de coalizão</b>.</p>
+    return `<p class="intro">Quase nunca um presidente tem maioria sozinho. Para aprovar leis, projetos grandes e gastos extras, é preciso montar uma coalizão. Os cientistas políticos chamam isso de ${termo("coalizao", "presidencialismo de coalizão")}.</p>
       <div class="medidor"><div class="md-top"><span>Apoio no Congresso</span><b>${Math.round(c)}</b></div><div class="md-bar"><i style="width:${c}%;background:${c >= 50 ? BOM : c >= 35 ? MEIO : RUIM}"></i></div></div>
       <article class="proj camara"><header class="pj-autor"><span class="avatar" style="--c:#4b6aa8">${esc(iniciais(CAMARA.nome))}</span><div><b>${esc(CAMARA.nome)}</b><small>${esc(CAMARA.cargo)}</small></div></header><blockquote>“${esc(fala)}”</blockquote></article>
       <h3 class="sub">Negociar</h3>
@@ -224,7 +256,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     ];
     const tot = partes.reduce((s, p) => s + p[1], 0);
     const desteAno = e.projetos.filter(p => p.anoInicio === e.ano);
-    return `<p class="intro">O orçamento federal de 2027 é de cerca de <b>R$ 2,58 trilhões</b>. Quase 90% já chega comprometido por lei: previdência, salários, Bolsa Família, BPC. Só uma fatia pequena é sua para decidir.</p>
+    return `<p class="intro">O orçamento federal de 2027 é de cerca de <b>R$ 2,58 trilhões</b>. Quase 90% já chega ${termo("obrigatorias", "comprometido por lei")}: previdência, salários, Bolsa Família, BPC. Só uma ${termo("discricionarias", "fatia pequena")} é sua para decidir, e o Congresso ainda tem as suas ${termo("emendas", "emendas")}.</p>
       <div class="barra">${partes.map(([n, v, c]) => `<i style="flex:${Math.max(v, 4)};background:${c}" title="${esc(n)}: ${esc(bi(v))}"></i>`).join("")}</div>
       <ul class="leg-orc">${partes.map(([n, v, c]) => `<li><i style="background:${c}"></i><span>${esc(n)}</span><b>${esc(bi(Math.round(v * 10) / 10))}</b><small>${nf(v / tot * 100)}%</small></li>`).join("")}</ul>
       <details class="obrig"><summary>O que são as obrigatórias</summary><ul>${Object.entries(o.obrigatorias_detalhe).map(([k, v]) => `<li><span>${esc(k)}</span><b>${esc(bi(v))}</b></li>`).join("")}</ul></details>
@@ -243,13 +275,23 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
   function modal(html, cls = "") {
     const m = $("#gov-modal");
     m.querySelector(".gm-box").className = "gm-box " + cls;
-    m.querySelector(".gm-box").innerHTML = html;
+    m.querySelector(".gm-box").innerHTML = `<div id="gm-marta" class="gm-marta" hidden></div>` + html;
     m.hidden = false;
     m.querySelector(".gm-box").scrollTop = 0;
+    tut.preencherModal();
   }
   const fecharModal = () => { $("#gov-modal").hidden = true; };
 
   let escolhidas = [];
+  function telaModo() {
+    modal(`<p class="eyebrow">Antes da posse</p>
+      <h2>Primeira vez no Palácio?</h2>
+      <p class="lead">A chefe de gabinete pode te acompanhar no primeiro ano, mostrando o país, as regras e cada tela, uma de cada vez. Leva poucos minutos.</p>
+      <div class="modo">
+        <button type="button" class="modo-i" data-acao="modo-guiado"><b>Governar com a ajuda do gabinete</b><small>Recomendado na primeira partida</small></button>
+        <button type="button" class="modo-i" data-acao="modo-livre"><b>Já sei jogar</b><small>Vai direto para as promessas</small></button>
+      </div>`, "modo");
+  }
   function telaPromessas() {
     modal(`<p class="eyebrow">1º de janeiro de ${e.anoInicial}</p>
       <h2>Você toma posse como presidente.</h2>
@@ -301,7 +343,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     const snap = t.closest("[data-snap]");
     if (snap) { snapshot = snap.dataset.snap; renderTopo(); pintarMapa(); return; }
     const ab = t.closest("[data-aba]");
-    if (ab) { aba = ab.dataset.aba; confirmando = false; ultimoMontado = null; renderAbas(); renderCorpo(); renderRodape(); abrirPainel(); return; }
+    if (ab) { aba = ab.dataset.aba; confirmando = false; ultimoMontado = null; renderAbas(); renderCorpo(); renderRodape(); abrirPainel(); tut.fecharBalao(); tut.dicaAba(aba); tut.aposRender(); return; }
     const pr = t.closest("[data-prom]");
     if (pr) {
       const id = pr.dataset.prom;
@@ -315,12 +357,12 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
       const r = executarProjeto(e, c);
       cartasUsadas[e.ano][i] = r.ok ? { ok: true, id: r.proj.id, texto: r.chance != null ? `Aprovado pelo Congresso (${Math.round(r.chance * 100)}%)` : "Aprovado" } : { ok: false, texto: `Rejeitado pelo Congresso (${Math.round(r.chance * 100)}% de chance)` };
       if (c.regiao !== "Nacional") mapa.voarRegiao(c.regiao);
-      salvar(); render(); return;
+      salvar(); render(); if (r.ok) tut.notificar("carta"); return;
     }
     if (t.closest("[data-montar]")) {
       const r = executarProjeto(e, { ...spec });
       ultimoMontado = r.ok ? { ok: true, texto: "Aprovado. Monte outro se quiser." } : { ok: false, texto: `Rejeitado pelo Congresso (${Math.round(r.chance * 100)}% de chance)` };
-      salvar(); render(); return;
+      salvar(); render(); if (r.ok) tut.notificar("carta"); return;
     }
     const des = t.closest("[data-desfazer]");
     if (des) {
@@ -340,7 +382,8 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     const ac = t.closest("[data-acao]");
     if (!ac) return;
     const a = ac.dataset.acao;
-    if (a === "posse") { escolherPromessas(e, escolhidas); fecharModal(); aba = e.eventos.length ? "eventos" : "ministros"; salvar(); render(); mapa.visaoGeral(); }
+    if (a === "posse") { escolherPromessas(e, escolhidas); fecharModal(); aba = e.eventos.length ? "eventos" : "ministros"; salvar(); render(); mapa.visaoGeral(); tut.notificar("posse"); }
+    else if (a === "modo-guiado" || a === "modo-livre") { tut.comecar(a === "modo-guiado"); if (a === "modo-livre") telaPromessas(); else fecharModal(); }
     else if (a === "ir-eventos") { aba = "eventos"; render(); abrirPainel(); }
     else if (a === "fechar") { confirmando = true; renderRodape(); }
     else if (a === "cancelar") { confirmando = false; renderRodape(); }
@@ -349,7 +392,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
       const rel = fecharAno(e);
       if (e.fase === "fim") snapshot = "agora";
       aba = e.fase === "fim" ? aba : (e.eventos.length ? "eventos" : "ministros");
-      salvar(); render(); telaAno(rel);
+      salvar(); render(); telaAno(rel); tut.notificar("balanco");
     }
     else if (a === "seguir") { fecharModal(); mapa.visaoGeral(); }
     else if (a === "ver-fim") telaFim();
@@ -359,7 +402,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
   });
   root.addEventListener("change", ev => {
     const r = ev.target.closest("input[data-ev]");
-    if (r) { responderEvento(e, +r.dataset.ev, r.value); salvar(); renderAbas(); renderCorpo(); renderRodape(); renderTopo(); return; }
+    if (r) { responderEvento(e, +r.dataset.ev, r.value); salvar(); renderAbas(); renderCorpo(); renderRodape(); renderTopo(); tut.notificar("evento"); return; }
     if (ev.target.closest(".montar")) { ultimoMontado = null; atualizarMontar(); }
   });
 
@@ -373,12 +416,15 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     await carregarInicio();
     e = criarJogo(inicio, { semente: (Date.now() % 2147483647) | 0 });
     escolhidas = []; cartasUsadas = {}; snapshot = "agora"; indMapa = "idhm"; root.classList.remove("terminado");
+    tut.usar(e);
     render();
-    telaPromessas();
+    telaModo();
   }
   function continuar(x) {
     e = x; cartasUsadas = {}; snapshot = "agora"; root.classList.remove("terminado");
+    tut.usar(e);
     render();
+    tut.retomar();
     if (e.fase === "promessas") telaPromessas();
     else if (e.fase === "fim") telaFim();
     else fecharModal();

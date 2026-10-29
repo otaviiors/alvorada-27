@@ -188,7 +188,7 @@ Dificuldade e duração são escolhas separadas.
 - **Honesto.** Os dados de partida são reais e citados. Os efeitos das decisões vêm de um modelo simplificado, e o jogo diz isso.
 - **Ensina jogando.** Cada regra deve ensinar algo verdadeiro sobre como o Brasil é governado.
 
-## 11. Engajamento: contexto, objetivo e pessoas — *proposta (29/10/2026)*
+## 11. Engajamento: contexto, objetivo e pessoas — *decidido (29/10/2026); entrega 1 (tutorial e linguagem) pronta*
 
 Primeiro teste do Otávio (29/10/2026): o jogo é educativo, mas faltou contexto, tutorial e um objetivo claro; foi preciso esforço para se interessar. Como ele não gosta de política, é exatamente o público a conquistar.
 

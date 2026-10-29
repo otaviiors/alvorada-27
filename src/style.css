@@ -293,7 +293,7 @@ body.hud-off .gov-hud { opacity: 0; pointer-events: none; }
 .gt-ind:hover .tip, .gt-ind:focus-visible .tip { opacity: 1; }
 .gt-caixa { display: flex; align-items: center; gap: 8px; background: var(--noite); border: 1px solid rgba(63, 143, 90, 0.6); border-radius: 12px; padding: 6px 12px; color: #8fd4a6; }
 .gt-caixa span { display: flex; flex-direction: column; }
-.gt-caixa b { font: 600 15px/1 var(--f-data); color: var(--papel); }
+.gt-caixa b { font: 600 15px/1 var(--f-data); color: var(--papel); white-space: nowrap; }
 .gt-caixa small { font-size: 11px; color: var(--nevoa); margin-top: 3px; }
 .gt-snap { display: flex; background: var(--noite); border: 1px solid var(--linha); border-radius: 999px; padding: 3px; }
 .gt-snap button { background: none; border: 0; border-radius: 999px; padding: 6px 14px; font: 700 14px/1 var(--f-map); letter-spacing: 0.05em; color: var(--nevoa); }
@@ -483,4 +483,43 @@ body.gov-on #zoom { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right
   .gm-box { padding: 20px 16px 16px; border-radius: 16px; }
   .montar { grid-template-columns: 1fr 1fr; }
   .pj-num { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+/* ---------- tutorial e glossário ---------- */
+#gov.pre-posse #gov-panel, #gov.pre-posse .gt-caixa { display: none; }
+#coach {
+  position: absolute; z-index: 45; left: calc(440px + env(safe-area-inset-left, 0px)); bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  width: min(420px, calc(100vw - 32px)); background: #f6f1e4; color: #2b2418; border-radius: 16px; padding: 14px 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45); display: flex; flex-direction: column; gap: 10px; animation: subir 0.35s ease both;
+}
+#coach[hidden] { display: none; }
+#gov.pre-posse ~ #coach, #gov.pre-posse #coach { left: 50%; transform: translateX(-50%); animation: none; }
+.ch-top { display: flex; align-items: center; gap: 10px; }
+.ch-top b { display: block; font-size: 14px; }
+.ch-top small { color: #6b6150; font-size: 12px; }
+.ch-pular { margin-left: auto; color: #6b6150 !important; font-size: 12.5px; }
+#coach p, .gm-marta p { margin: 0; font-size: 15px; line-height: 1.5; }
+.ch-acoes { display: flex; justify-content: flex-end; }
+#coach .btn, .gm-marta .btn { background: #2b2418; color: #f6f1e4; }
+#coach .avatar, .gm-marta .avatar { box-shadow: 0 0 0 2px #2b2418; }
+.gm-marta { background: #f6f1e4; color: #2b2418; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.gm-marta[hidden] { display: none; }
+.gm-marta .termo, #coach .termo { color: #5b3fa0; }
+.destaque { outline: 3px solid var(--ipe) !important; outline-offset: 3px; border-radius: 12px; animation: pulso 1.6s ease-in-out infinite; z-index: 6; }
+@keyframes pulso { 50% { outline-color: rgba(242, 194, 48, 0.35); } }
+.termo { background: none; border: 0; padding: 0; font: inherit; color: var(--cerrado); text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+#termo-pop { position: fixed; z-index: 60; background: #f6f1e4; color: #2b2418; border-radius: 12px; padding: 12px 14px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45); font-size: 14px; line-height: 1.45; }
+#termo-pop[hidden] { display: none; }
+#termo-pop p { margin: 4px 0 0; }
+.modo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modo-i { text-align: left; display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 14px; border: 1px solid var(--linha); background: rgba(243, 240, 230, 0.04); color: var(--papel); }
+.modo-i:first-child { border-color: var(--ipe); background: rgba(242, 194, 48, 0.1); }
+.modo-i b { font-size: 16px; }
+.modo-i small { color: var(--nevoa); font-size: 13px; }
+.modo-i:hover { border-color: var(--ipe); }
+.pj-gente { margin: 0; font-size: 12.5px; color: #cfe8d6; background: rgba(63, 143, 90, 0.14); border-radius: 8px; padding: 6px 9px; }
+@media (max-width: 760px) {
+  #coach { left: 12px; right: 12px; width: auto; bottom: auto; top: calc(116px + env(safe-area-inset-top, 0px)); }
+  #gov.pre-posse #coach { left: 12px; transform: none; top: auto; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
+  .modo { grid-template-columns: 1fr; }
 }
