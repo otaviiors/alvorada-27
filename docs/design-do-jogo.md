@@ -62,7 +62,7 @@ Pisos constitucionais já garantidos dentro do total: saúde 272,2 e educação 
 
 **Mecânica proposta:** o jogador vê o orçamento inteiro como uma barra, com 89% travado. Só a fatia livre (cerca de R$ 214 bi) é dele, gasta em **projetos** (ver seção 5). Gastar acima da fatia é possível, mas piora as contas públicas. As emendas são gastas pelo Congresso por conta própria.
 
-## 5. As decisões — *proposta*
+## 5. As decisões — *decidido (29/10/2026)*
 
 A fatia livre do orçamento é gasta em **projetos**, de dois jeitos que usam as mesmas regras:
 
@@ -80,11 +80,36 @@ Para que montar livremente continue sendo uma escolha (e não um atalho), valem 
 - **Custo que fica:** obras e serviços deixam custo de manutenção nos anos seguintes, que entra no orçamento travado.
 - **Capacidade de execução:** cada área consegue gastar bem só até certo ponto por ano.
 
-Ideia para o futuro: o jogador escreve a proposta em texto livre e uma IA a traduz em projeto. Fica para depois, porque precisa de servidor, tem custo e é mais difícil manter equilibrado e neutro.
+Ideia para o futuro (o Otávio quer trazer IA para o jogo): o jogador escreve a proposta em texto livre e uma IA a traduz em projeto. Fica para depois, porque precisa de servidor, tem custo e é mais difícil manter equilibrado e neutro.
 
-## 6. Os eventos — *em aberto*
+## 6. Os eventos — *proposta*
 
-Crises e oportunidades que aparecem durante o mandato.
+**Frequência:** 1 a 2 eventos por ano, sorteados no começo do turno, antes das decisões.
+
+**Tipos, com exemplos inspirados em casos reais:**
+
+| Tipo | Exemplos | Região típica |
+|---|---|---|
+| Clima e natureza | Seca prolongada, enchente, queimadas, onda de calor | Nordeste, Sul, Norte e Centro-Oeste |
+| Economia | Queda no preço da soja ou do minério, crise internacional, alta do petróleo | Nacional ou regiões exportadoras |
+| Saúde e sociedade | Epidemia de dengue, greve de caminhoneiros, crise no sistema prisional | Nacional ou regional |
+| Política | Congresso trava uma votação, conflito com governadores, escândalo num ministério | Nacional |
+| Oportunidade | Safra recorde, investimento estrangeiro, descoberta de reserva, evento internacional sediado no país | Variada |
+
+**Cada evento pede uma resposta**, com 2 ou 3 opções de custo e efeito diferentes. Exemplo, enchente no Sul:
+- Socorro emergencial amplo: R$ 12 bi fora do orçamento, alívio rápido, piora as contas públicas.
+- Socorro dentro do orçamento: tira dinheiro de projetos já escolhidos, alívio parcial.
+- Repassar aos estados: custa pouco, recuperação lenta, desgaste com o governador e com a população.
+
+**As escolhas anteriores mudam os eventos** (causa e consequência):
+- Investir em prevenção e defesa civil reduz o estrago de enchentes e secas.
+- Desmatamento alto aumenta a chance de queimadas e de seca.
+- Contas públicas ruins deixam crises econômicas mais caras.
+- Aprovação alta facilita o Congresso em eventos políticos.
+
+**Neutralidade:** eventos políticos não citam partidos nem pessoas reais. Personagens são fictícios.
+
+**Ideia com IA para o futuro:** manchetes e notícias de jornal geradas a partir do que aconteceu no turno, para dar vida ao mundo sem precisar escrever cada texto à mão.
 
 ## 7. O Congresso e os personagens — *em aberto*
 
