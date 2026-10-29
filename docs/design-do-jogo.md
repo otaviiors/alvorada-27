@@ -62,9 +62,25 @@ Pisos constitucionais já garantidos dentro do total: saúde 272,2 e educação 
 
 **Mecânica proposta:** o jogador vê o orçamento inteiro como uma barra, com 89% travado. Só a fatia livre (cerca de R$ 214 bi) é dele, gasta em **projetos** (ver seção 5). Gastar acima da fatia é possível, mas piora as contas públicas. As emendas são gastas pelo Congresso por conta própria.
 
-## 5. As decisões — *em aberto*
+## 5. As decisões — *proposta*
 
-Distribuição do orçamento, medidas em forma de cartas, escolhas por região.
+A fatia livre do orçamento é gasta em **projetos**, de dois jeitos que usam as mesmas regras:
+
+- **Cartas sugeridas pelos ministros:** a cada ano, cerca de 8 projetos prontos (ex.: "Hospital regional no Norte — R$ 6 bi"). Rápido e concreto.
+- **Projeto próprio:** o jogador monta o seu escolhendo:
+  1. **Área:** saúde, educação, infraestrutura, segurança, meio ambiente, economia e emprego, assistência social.
+  2. **Região:** uma das 5, ou nacional.
+  3. **Tipo:** construir (obra), contratar e manter (serviço contínuo), transferir (dinheiro direto às pessoas ou aos estados), regular ou fiscalizar.
+  4. **Tamanho:** pequeno, médio ou grande.
+  O jogo calcula custo, efeitos e prazo com as mesmas fórmulas das cartas. Uma carta é só um projeto já montado.
+
+Para que montar livremente continue sendo uma escolha (e não um atalho), valem regras realistas:
+- **Retorno decrescente:** o 10º hospital na mesma região rende menos que o 1º.
+- **Prazo:** obras grandes levam anos para dar efeito; transferências agem rápido, mas não constroem nada.
+- **Custo que fica:** obras e serviços deixam custo de manutenção nos anos seguintes, que entra no orçamento travado.
+- **Capacidade de execução:** cada área consegue gastar bem só até certo ponto por ano.
+
+Ideia para o futuro: o jogador escreve a proposta em texto livre e uma IA a traduz em projeto. Fica para depois, porque precisa de servidor, tem custo e é mais difícil manter equilibrado e neutro.
 
 ## 6. Os eventos — *em aberto*
 
