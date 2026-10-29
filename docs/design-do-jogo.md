@@ -1,5 +1,7 @@
 # Design do jogo
 
+A visão geral e as ideias futuras estão em [visao.md](visao.md).
+
 Documento vivo. Cada seção é decidida em conversa e marcada como **decidido**, **proposta** ou **em aberto**.
 
 Prazo-alvo: primeira versão jogável até **1º de janeiro de 2027**, quando começa o novo mandato.
@@ -158,7 +160,7 @@ Ideia para o futuro (o Otávio quer trazer IA para o jogo): o jogador escreve a 
 2. **Legado:** o que melhorou, o que piorou e **quem ficou de fora** (a região mais esquecida, o indicador mais ignorado).
 3. **Reflexão final:** texto curto montado a partir das escolhas, sem julgar certo ou errado. Ex.: "Tu priorizou crescer rápido. O Centro-Oeste prosperou; a Amazônia pagou parte da conta. Governar é escolher o que deixar para depois."
 
-## 10. Dificuldade e duração — *proposta*
+## 10. Dificuldade e duração — *decidido (29/10/2026)*
 
 Dificuldade e duração são escolhas separadas.
 
