@@ -82,7 +82,7 @@ Para que montar livremente continue sendo uma escolha (e não um atalho), valem 
 
 Ideia para o futuro (o Otávio quer trazer IA para o jogo): o jogador escreve a proposta em texto livre e uma IA a traduz em projeto. Fica para depois, porque precisa de servidor, tem custo e é mais difícil manter equilibrado e neutro.
 
-## 6. Os eventos — *proposta*
+## 6. Os eventos — *decidido (29/10/2026)*
 
 **Frequência:** 1 a 2 eventos por ano, sorteados no começo do turno, antes das decisões.
 
@@ -106,6 +106,16 @@ Ideia para o futuro (o Otávio quer trazer IA para o jogo): o jogador escreve a 
 - Desmatamento alto aumenta a chance de queimadas e de seca.
 - Contas públicas ruins deixam crises econômicas mais caras.
 - Aprovação alta facilita o Congresso em eventos políticos.
+
+**Previsões com margem de incerteza** (como na vida real):
+- No fim de cada turno sai um **boletim de previsões** para o ano seguinte. Cada item traz região, **chance** de acontecer e **faixa de tamanho**. Ex.: "El Niño: 70% de chance de seca no Nordeste, de moderada a forte."
+- O evento real é sorteado **dentro da faixa avisada**. Às vezes não acontece (alarme falso), e às vezes vem no limite de cima.
+- Isso cria a decisão: gastar com prevenção agora, sem certeza, ou guardar o dinheiro e arriscar.
+- Nem tudo é previsível:
+  - **Clima e economia:** quase sempre avisados, com margem.
+  - **Saúde e sociedade:** às vezes avisados (ex.: sazonalidade da dengue), às vezes não.
+  - **Política e escândalos:** surpresa.
+- **Investir em ciência e monitoramento** (no espírito de Inpe, Cemaden, Inmet) estreita as faixas e aumenta os avisos. Prever melhor também é uma escolha de governo.
 
 **Neutralidade:** eventos políticos não citam partidos nem pessoas reais. Personagens são fictícios.
 
