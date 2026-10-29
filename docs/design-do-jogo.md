@@ -121,9 +121,28 @@ Ideia para o futuro (o Otávio quer trazer IA para o jogo): o jogador escreve a 
 
 **Ideia com IA para o futuro:** manchetes e notícias de jornal geradas a partir do que aconteceu no turno, para dar vida ao mundo sem precisar escrever cada texto à mão.
 
-## 7. O Congresso e os personagens — *em aberto*
+## 7. O Congresso e os personagens — *decidido (29/10/2026)*
 
-Quem pode travar ou ajudar o jogador, e como.
+**O Congresso**
+- Medidor de **apoio no Congresso** (0 a 100).
+- Projetos grandes, mudanças de regra e gastos acima do orçamento passam por **votação**; a chance de aprovar depende do apoio.
+- Ganhar apoio tem custo: atender emendas, ceder um ministério, apoiar projetos nas regiões dos parlamentares. Ignorar o Congresso economiza, mas trava o governo.
+- Lição: no Brasil o presidente quase nunca tem maioria sozinho e precisa montar uma coalizão (o **presidencialismo de coalizão**).
+
+**Elenco da primeira versão (todos fictícios)**
+| Personagem | Papel no jogo |
+|---|---|
+| 7 ministros, um por área (saúde, educação, infraestrutura, segurança, meio ambiente, economia e emprego, assistência social) | Trazem as cartas sugeridas; cada um tem um jeito e uma opinião (ex.: a ministra da economia sempre alerta para as contas) |
+| Presidente da Câmara | O rosto das negociações com o Congresso |
+| 5 governadores, um por região | Reagem ao que o jogador faz na região; ajudam ou atrapalham a execução dos projetos |
+| A população | Aparece pela aprovação e pelas manchetes |
+
+**Visual dos personagens**
+- **Ilustrados** desde a primeira versão, com rosto e expressões (ao menos neutro, satisfeito e preocupado).
+- Estilo **levemente caricato, entre o cartoon e o realismo**, combinando com a maquete.
+- Inventados do zero: **nenhuma semelhança com políticos reais**, nem nomes, nem rostos, nem partidos.
+- O elenco reflete a diversidade do Brasil (regiões, gêneros, idades, origens), sem estereótipos.
+- Produção das ilustrações: a definir (ilustração própria, artista ou geração por IA com estilo fixo e revisão).
 
 ## 8. Como o mapa reage — *em aberto*
 
