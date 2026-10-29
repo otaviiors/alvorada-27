@@ -4,7 +4,9 @@ Direção escolhida em 28/10/2026, a partir de referências de mapas-maquete.
 
 ## A ideia
 
-O Brasil como uma **maquete**: um bloco grosso de terra flutuando sobre o mar, com a lateral cortada mostrando as camadas do solo, vegetação em miniatura bem densa, cidades e marcos como peças de brinquedo, e uma luz suave de fim de tarde. O estilo fica entre o cartoon e o realismo.
+O Brasil como uma **maquete de relevo** pousada sobre um mapa antigo: um bloco grosso de terra com a lateral cortada mostrando o solo, relevo real exagerado e pintado à mão (verde nas terras baixas, ocre nas chapadas, tons claros nos picos), vegetação em miniatura, cidades e marcos como peças de brinquedo, e uma luz suave de fim de tarde. O estilo fica entre o cartoon e o realismo.
+
+A referência principal (escolhida em 28/10/2026) é um mapa-maquete da Argentina sobre papel envelhecido, com rosa dos ventos, rotas tracejadas e nomes em letra serifada.
 
 ## Elementos
 
@@ -16,7 +18,7 @@ O Brasil como uma **maquete**: um bloco grosso de terra flutuando sobre o mar, c
 
 ## Navegação
 
-Na tela principal, só zoom (sem arrastar para os lados). O zoom aproxima onde o cursor ou os dedos apontam.
+Zoom e arrastar, com limite para o Brasil não sair do quadro. Sem girar a câmera. O zoom aproxima onde o cursor ou os dedos apontam, e a câmera inclina conforme aproxima.
 
 ## Referências
 

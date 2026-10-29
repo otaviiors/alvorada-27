@@ -12,7 +12,7 @@ Alvorada 27 é um jogo web em três atos:
 
 ## Estado atual
 
-Protótipo 0.2 do Ato 1: o Brasil como maquete 3D (three.js), com vegetação por bioma, rios, cidades em miniatura, cinco camadas (natureza, regiões, PIB per capita, IDHM, densidade), ficha por estado e o controle de "céu". Direção visual em [docs/identidade-visual.md](docs/identidade-visual.md).
+Protótipo 0.3 do Ato 1: o Brasil como maquete de relevo sobre um mapa antigo (three.js), com relevo real exagerado, vegetação por bioma, rios, cidades em miniatura, cinco camadas (natureza, regiões, PIB per capita, IDHM, densidade), ficha por estado e o controle de "céu". Direção visual em [docs/identidade-visual.md](docs/identidade-visual.md).
 
 ## Como abrir
 
@@ -30,6 +30,7 @@ data/estados.geojson  contornos dos 27 estados
 data/estados-dados.json  números de cada estado, com fontes
 data/vizinhos.geojson países vizinhos (Natural Earth)
 data/rios.geojson     rios principais (Natural Earth)
+data/relevo.png       relevo da região (NASA, domínio público)
 ```
 
 ## Fontes dos dados
@@ -38,4 +39,4 @@ data/rios.geojson     rios principais (Natural Earth)
 - Densidade: IBGE, Anuário Estatístico do Brasil 2024
 - PIB e PIB per capita: IBGE, Contas Regionais 2023
 - IDHM: PNUD/Ipea/FJP, Radar IDHM 2024 (Amazonas e Amapá em verificação)
-- Contornos: IBGE; rios e países: Natural Earth; relevo: Terrain Tiles (Mapzen/AWS)
+- Contornos: IBGE; rios e países: Natural Earth; relevo: topografia global da NASA (domínio público)

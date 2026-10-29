@@ -14,6 +14,7 @@
 
   --f-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
   --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-map: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   --f-data: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
 
   --mood: 0.8;               /* 0 = tempestade, 1 = céu risonho */
@@ -144,11 +145,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* Rótulos sobre a maquete */
 .lb { position: absolute; left: 0; top: 0; will-change: transform; white-space: nowrap; }
-.lb-uf { font: 800 13px/1 var(--f-display); letter-spacing: 0.06em; color: #fffaf0;
-  text-shadow: 0 1px 2px rgba(20, 14, 6, 0.9), 0 0 8px rgba(20, 14, 6, 0.5); transform-origin: center; }
+.lb-uf { font: 700 15px/1 var(--f-map); letter-spacing: 0.14em; text-transform: uppercase; color: #3a2814;
+  text-shadow: 0 0 3px rgba(255, 244, 220, 0.95), 0 0 10px rgba(255, 240, 210, 0.7); }
+.lb-uf .nm { display: none; font-size: 17px; letter-spacing: 0.18em; }
+#labels.near .lb-uf .sg { display: none; }
+#labels.near .lb-uf .nm { display: inline; }
 .lb-cap { display: flex; align-items: center; gap: 5px; }
-.lb-cap i { width: 6px; height: 6px; border-radius: 50%; background: var(--ipe); box-shadow: 0 0 0 2px rgba(11, 31, 46, 0.85); }
-.lb-cap span { font: 600 11px/1 var(--f-body); color: #fffaf0; text-shadow: 0 1px 3px rgba(0,0,0,0.95); }
+.lb-cap i { width: 7px; height: 7px; border-radius: 50%; background: #7a2e1c; box-shadow: 0 0 0 2px rgba(255, 244, 220, 0.9); }
+.lb-cap span { font: italic 600 14px/1 var(--f-map); color: #3a2814; text-shadow: 0 0 3px rgba(255,244,220,0.95), 0 0 8px rgba(255,240,210,0.6); }
 .lb.off { display: none; }
 
 /* Zoom */
