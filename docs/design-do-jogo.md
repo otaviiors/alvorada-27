@@ -235,3 +235,17 @@ Decisões da conversa: **nota + reeleição + missões**; **cidadãos + manchete
 
 ### Linguagem
 - Equilíbrio: a parte política continua (é o que o jogo ensina de mais valioso), mas sem jargão solto. Todo termo técnico ganha explicação curta ao tocar (ex.: IDHM, discricionárias, emendas).
+
+## 12. Fim da jogada única — *decidido (30/10/2026), entra junto com a entrega 3*
+
+Segundo teste do Otávio: o jogo virou sempre a mesma jogada, colocar tudo no Nordeste. É uma **estratégia dominante**: o Nordeste está pior em quase tudo, o dinheiro rende mais onde a necessidade é maior, e concentrar não custa nada. Investir no Nordeste continua valendo; ela só precisa ter preço, como na vida real. Três pressões que conversam entre si:
+
+### Votos por região
+- Na eleição do fim do mandato, os votos vêm de cada região conforme o tamanho do eleitorado (Sudeste ≈ 42%, Nordeste ≈ 27%, dados do TSE a conferir). Melhorar o país e perder a eleição é possível: fazer o que o país mais precisa ou o que reelege?
+
+### Bancadas no Congresso
+- Deputados e senadores votam pensando no seu estado. Cada região tem uma bancada com humor próprio. Região esquecida por muito tempo faz a bancada virar contra, e os projetos passam a perder votações.
+
+### Capacidade de execução
+- Cada região aguenta um número limitado de obras e contratações por ano (engenheiros, licenças, gente para contratar). Os projetos além disso rendem menos ou atrasam.
+- **Equipe federal (ideia do Otávio):** dá para mandar uma equipe de fora para a obra. Fica mais caro, mas fura o limite da região. Paralelos reais: os batalhões de engenharia do Exército, que constroem estradas na Amazônia, e as forças-tarefa federais de saúde. As equipes federais também têm limite por ano no país todo.
