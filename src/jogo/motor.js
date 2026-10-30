@@ -5,7 +5,7 @@
 import {
   REGIOES, ORCAMENTO, AREAS, TIPOS, TAMANHOS, PRAZO, MANUTENCAO, PESO_REGRA, NOMES, NOME_NACIONAL,
   EFEITOS, TIPO_MULT, TEMPORARIO, PRESSAO_FLORESTA, REGIOES_FLORESTA, MEIA_VIDA, TENDENCIA, VOTACAO,
-  PROMESSAS, MINISTROS, GOVERNADORES, CAMARA, NEGOCIACOES, EVENTOS
+  PROMESSAS, MINISTROS, GOVERNADORES, CAMARA, NEGOCIACOES, EVENTOS, promessaDe, TEMAS_PROMESSA, AMBICAO
 } from "./regras.js";
 import { iniciarPovo, atualizarGrupos, aprovacaoGeral, reacoesCidadaos, manchetes, GRUPOS, CIDADAOS, ELEITORES, quemGosta, gostosDoGrupo } from "./povo.js";
 
@@ -74,7 +74,7 @@ export function criarJogo(inicio, { semente = Date.now() % 2147483647, anos = 4 
 
 export function escolherPromessas(e, ids) {
   if (e.fase !== "promessas") throw new Error("As promessas são escolhidas só no começo.");
-  const validas = ids.filter(id => PROMESSAS.some(p => p.id === id));
+  const validas = [...new Set(ids)].filter(id => promessaDe(id, e.ini));
   if (validas.length !== 3) throw new Error("Escolha exatamente 3 promessas.");
   e.promessas = validas;
   iniciarAno(e);
@@ -517,9 +517,9 @@ export function relatorioFinal(e) {
   const f = { nac: e.nac, reg: e.reg, ini: e.ini,
     mediaCrescimento: e.historico.reduce((s, h) => s + h.nac.crescimento, 0) / Math.max(1, e.historico.length) };
   const promessas = e.promessas.map(id => {
-    const p = PROMESSAS.find(x => x.id === id);
+    const p = promessaDe(id, e.ini);
     const v = p.medir(f);
-    return { id, texto: p.texto, alvo: p.alvo, valor: v, cumprida: p.meta(v) };
+    return { id, texto: p.texto, alvo: p.alvo, valor: v, resultado: p.fmt(v), cumprida: p.meta(v), ambicao: p.ambicao || null };
   });
   const ind = [
     { id: "crescimento", nome: "Crescimento médio", ini: e.ini.nac.crescimento, fim: r1(f.mediaCrescimento), melhorSe: "maior", un: "%" },
@@ -562,5 +562,5 @@ export function relatorioFinal(e) {
   return { promessas, indicadores: ind, porRegiao: perCap, porArea, regEsquecida, regFavorita, areaFoco, areaIgnorada, reflexao: frases, manutencao: e.manutencao };
 }
 
-export { GRUPOS, CIDADAOS, ELEITORES, quemGosta, gostosDoGrupo };
+export { GRUPOS, CIDADAOS, ELEITORES, quemGosta, gostosDoGrupo, promessaDe, TEMAS_PROMESSA, AMBICAO };
 export { REGIOES, AREAS, TIPOS, TAMANHOS, PROMESSAS, MINISTROS, GOVERNADORES, CAMARA, NEGOCIACOES, ORCAMENTO };

@@ -755,8 +755,15 @@ function applyLayer() {
       const k = 0.55 + lum * 0.9;
       arr[i] = lerp(nat[i], c.r * k, 0.82); arr[i + 1] = lerp(nat[i + 1], c.g * k, 0.82); arr[i + 2] = lerp(nat[i + 2], c.b * k, 0.82);
     }
+    // fora do foco: mais escuro e sem cor, para a região escolhida saltar aos olhos
+    const fora = S.foco && !S.foco.includes(st.uf);
+    if (fora) for (let i = 0; i < arr.length; i += 3) {
+      const l = (arr[i] + arr[i + 1] + arr[i + 2]) / 3;
+      arr[i] = lerp(arr[i], l, 0.55) * 0.62; arr[i + 1] = lerp(arr[i + 1], l, 0.55) * 0.62; arr[i + 2] = lerp(arr[i + 2], l, 0.55) * 0.66;
+    }
     attr.needsUpdate = true;
-    const tint = c ? c.clone().lerp(white, 0.35) : white;
+    let tint = c ? c.clone().lerp(white, 0.35) : white;
+    if (fora) tint = tint.clone().multiplyScalar(0.55);
     st.treeMats.forEach(m => m.color.copy(tint));
   }
   renderLegend();
@@ -814,6 +821,7 @@ function updateLabels() {
     const off = _v.z > 1 || _v.x < -1.1 || _v.x > 1.1 || _v.y < -1.1 || _v.y > 1.1;
     l.el.classList.toggle("off", off);
     if (off) continue;
+    l.el.classList.toggle("fora", !!S.foco && !S.foco.includes(l.st.uf));
     const x = (_v.x * 0.5 + 0.5) * W, y = (-_v.y * 0.5 + 0.5) * H;
     l.el.style.transform = l.kind === "uf"
       ? `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%)`
@@ -916,6 +924,7 @@ function select(uf, fromHash) {
   if (uf && !S.states[uf]) uf = null;
   S.selected = uf;
   setLift();
+  setFoco(uf ? [uf] : null);
   if (uf) { document.getElementById("panel").classList.remove("collapsed"); applyViewOffset(); stateView(uf); }
   else overview(true);
   renderPanel();
@@ -1102,6 +1111,61 @@ function drawSun(svg, animate) {
   if (animate && !REDUCED) g.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], { duration: 90000, iterations: Infinity });
 }
 
+/* ============ Foco: a região escolhida fica nítida, o resto desfocado ============ */
+const focoEl = document.getElementById("foco");
+let focoCss = "";
+function setFoco(ufs) {
+  const novo = ufs && ufs.length ? ufs.slice().sort() : null;
+  if (String(novo) === String(S.foco)) return;
+  S.foco = novo;
+  applyLayer();
+  if (!novo) { focoEl.classList.remove("on"); focoCss = ""; }
+}
+const _c = new THREE.Vector3();
+function updateFoco() {
+  if (!S.foco) return;
+  let x0 = 180, y0 = 90, x1 = -180, y1 = -90;
+  for (const uf of S.foco) { const b = S.states[uf].bbox; x0 = Math.min(x0, b[0]); y0 = Math.min(y0, b[1]); x1 = Math.max(x1, b[2]); y1 = Math.max(y1, b[3]); }
+  const stg = document.getElementById("stage"), W = stg.clientWidth, H = stg.clientHeight;
+  let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity;
+  for (const lon of [x0, x1]) for (const lat of [y0, y1]) for (const h of [0, 0.6]) {
+    _c.set(px(lon), TOP + h, -py(lat)).project(camera);
+    const x = (_c.x * 0.5 + 0.5) * W, y = (-_c.y * 0.5 + 0.5) * H;
+    a = Math.min(a, x); b = Math.min(b, y); c = Math.max(c, x); d = Math.max(d, y);
+  }
+  const cx = (a + c) / 2, cy = (b + d) / 2, rx = (c - a) / 2 * 1.3 + 30, ry = (d - b) / 2 * 1.3 + 30;
+  const css = `radial-gradient(ellipse ${rx.toFixed(0)}px ${ry.toFixed(0)}px at ${cx.toFixed(0)}px ${cy.toFixed(0)}px, transparent 72%, #000 100%)`;
+  if (css !== focoCss) { focoCss = css; focoEl.style.maskImage = css; focoEl.style.webkitMaskImage = css; }
+  focoEl.classList.add("on");
+}
+const ufsDaRegiao = r => Object.values(S.states).filter(st => st.e.regiao === r).map(st => st.uf);
+
+/* ============ Marcadores no mapa (ministros pedindo projetos) ============ */
+const mkBox = document.getElementById("marcadores");
+let marcadores = [];
+function updateMarcadores() {
+  if (!marcadores.length) return;
+  const stg = document.getElementById("stage"), W = stg.clientWidth, H = stg.clientHeight;
+  const vis = [];
+  for (const m of marcadores) {
+    _c.copy(m.p); _c.y += m.st.lift; _c.project(camera);
+    m.off = _c.z > 1 || _c.x < -1.05 || _c.x > 1.05 || _c.y < -1.05 || _c.y > 1.05;
+    m.el.classList.toggle("off", m.off);
+    if (m.off) continue;
+    m.x = (_c.x * 0.5 + 0.5) * W + m.dx; m.y = (-_c.y * 0.5 + 0.5) * H;
+    vis.push(m);
+  }
+  // afasta rostos que caíram um em cima do outro
+  const R = MOBILE() ? 36 : 44;
+  for (let it = 0; it < 4; it++) for (let i = 0; i < vis.length; i++) for (let j = i + 1; j < vis.length; j++) {
+    const A = vis[i], B = vis[j]; let dx = B.x - A.x, dy = B.y - A.y; const d = Math.hypot(dx, dy);
+    if (d >= R) continue;
+    if (d < 0.01) { dx = 1; dy = 0; } else { dx /= d; dy /= d; }
+    const k = (R - d) / 2; A.x -= dx * k; A.y -= dy * k; B.x += dx * k; B.y += dy * k;
+  }
+  for (const m of vis) m.el.style.transform = `translate(${m.x.toFixed(1)}px, ${m.y.toFixed(1)}px)`;
+}
+
 /* ============ Laço de animação ============ */
 const BOUND = { x0: -19, x1: 18.5, z0: -19.5, z1: 19.5 };
 function loop(hoverCheck) {
@@ -1147,6 +1211,8 @@ function loop(hoverCheck) {
     if (S.needShadow) { renderer.shadowMap.needsUpdate = true; S.needShadow = false; }
     renderer.render(scene, camera);
     updateLabels();
+    updateFoco();
+    updateMarcadores();
     requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
@@ -1180,7 +1246,7 @@ function centroRegiao(regiao) {
 let ultimaRegiao = null;
 const mapaAPI = {
   colorir(cores) {
-    if (cores === undefined) { S.layer = S.layerExplorar || "natureza"; S.jogoCores = null; }
+    if (cores === undefined) { S.layer = S.layerExplorar || "natureza"; S.jogoCores = null; S.foco = null; focoEl.classList.remove("on"); }
     else if (cores === null) { if (S.layer !== "jogo") S.layerExplorar = S.layer; S.layer = "jogo"; S.jogoCores = null; }
     else { if (S.layer !== "jogo") S.layerExplorar = S.layer; S.layer = "jogo"; S.jogoCores = cores; }
     applyLayer();
@@ -1189,10 +1255,31 @@ const mapaAPI = {
   voarRegiao(regiao) {
     if (ultimaRegiao === regiao) return;
     ultimaRegiao = regiao;
+    setFoco(ufsDaRegiao(regiao));
     const c = centroRegiao(regiao);
     flyTo(c.t, clamp(distToFit(c.w, c.d) * 1.1, 6, S.overviewDist), 1400);
   },
-  visaoGeral() { ultimaRegiao = null; overview(true); },
+  visaoGeral() { ultimaRegiao = null; setFoco(null); overview(true); },
+  /* lista: [{ id, regiao, cor, iniciais, nome, cargo, titulo, detalhe }]; aoTocar(id) */
+  marcadores(lista, aoTocar) {
+    mkBox.innerHTML = ""; marcadores = [];
+    const porLugar = {};
+    for (const m of lista) {
+      let st, lon, lat;
+      if (m.regiao === "Nacional") { st = S.states.DF; lon = st.e.lon; lat = st.e.lat; }
+      else { let h = 0; for (const ch of m.id) h = (h * 31 + ch.charCodeAt(0)) % 100003; ({ st, lon, lat } = pontoNaRegiao(m.regiao, h)); }
+      const k = m.regiao; porLugar[k] = (porLugar[k] || 0) + 1;
+      const el = document.createElement("button");
+      el.type = "button"; el.className = "mk";
+      el.setAttribute("aria-label", `${m.nome}: ${m.titulo}`);
+      el.innerHTML = `<span class="mk-av" style="--c:${m.cor}">${esc(m.iniciais)}</span><span class="mk-bal"><b>${esc(m.nome)}</b><small>${esc(m.cargo)}</small><span>${esc(m.titulo)}</span><em>${esc(m.detalhe)}</em></span>`;
+      el.addEventListener("click", ev => { ev.stopPropagation(); aoTocar && aoTocar(m.id); });
+      el.addEventListener("pointerdown", ev => ev.stopPropagation());
+      mkBox.appendChild(el);
+      marcadores.push({ el, st, p: new THREE.Vector3(px(lon), TOP + heightAt(lon, lat) + 0.15, -py(lat)), dx: (porLugar[k] - 1) * 0.5 });
+    }
+    updateMarcadores();
+  },
   async projetos(lista) {
     const ids = new Set(lista.map(p => p.id));
     for (const [id, sp] of projSprites) if (!ids.has(id)) { sp.parent && sp.parent.remove(sp); projSprites.delete(id); }

@@ -4,7 +4,7 @@ import {
   criarJogo, escolherPromessas, montarProjeto, executarProjeto, desfazerProjeto, responderEvento, negociar,
   fecharAno, relatorioFinal, resumoEfeitos, chanceVotacao, eventosPendentes,
   REGIOES, AREAS, TIPOS, TAMANHOS, PROMESSAS, CAMARA, NEGOCIACOES, ORCAMENTO,
-  GRUPOS, CIDADAOS, ELEITORES, quemGosta, gostosDoGrupo
+  GRUPOS, CIDADAOS, ELEITORES, quemGosta, gostosDoGrupo, promessaDe, TEMAS_PROMESSA, AMBICAO
 } from "./jogo/motor.js";
 import { iconSVG, ICONES } from "./icones.js";
 import { criarTutorial, termo } from "./tutorial.js";
@@ -63,6 +63,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     indicador(id) { indMapa = id; if (e) { renderTopo(); pintarMapa(); } },
     aba(id) { aba = id; renderAbas(); renderCorpo(); renderRodape(); abrirPainel(); },
     promessas: () => telaPromessas(),
+    painel: on => { painel.classList.toggle("collapsed", !on); setTimeout(mapa.reajustar, 360); },
     salvar: () => salvar(),
     render: () => render()
   } });
@@ -102,12 +103,31 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     mapa.projetos(e.projetos.filter(p => p.regiao !== "Nacional" && p.tipo !== "regular").map(p => ({ id: p.id, regiao: p.regiao, icone: AREA_ICONE[p.area], pronto: p.pronto })));
   }
 
+  const transicao = () => e.fase === "promessas";
+
+  /* ministros no mapa: cada proposta aparece como um rosto na região do pedido */
+  function sincronizarMinistros() {
+    if (e.fase !== "decisoes" || !e.cartas) { mapa.marcadores([]); return; }
+    const usadas = cartasUsadas[e.ano] || {};
+    mapa.marcadores(e.cartas.map((c, i) => ({ c, i })).filter(({ i }) => !(usadas[i] && usadas[i].ok)).map(({ c, i }) => ({
+      id: `${e.ano}-${i}`, regiao: c.regiao, iniciais: iniciais(c.autor), nome: c.autor, cargo: c.cargo,
+      cor: c.autorId.startsWith("gov") ? "#6b7c8f" : AREAS[c.autorId].cor,
+      titulo: c.nome, detalhe: `${bi(c.custo)} · toque para ver a proposta`
+    })), id => {
+      const i = +id.split("-")[1];
+      aba = "ministros"; confirmando = false; render(); abrirPainel();
+      if (e.cartas[i].regiao !== "Nacional") mapa.voarRegiao(e.cartas[i].regiao);
+      const el = root.querySelectorAll("#gov-body .proj")[i];
+      if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); el.classList.remove("piscar"); void el.offsetWidth; el.classList.add("piscar"); }
+    });
+  }
+
   /* ---------- topo ---------- */
   function renderTopo() {
     const total = e.anoFinal - e.anoInicial + 1, n = Math.min(e.ano - e.anoInicial + 1, total);
     const fim = e.fase === "fim";
     $("#gov-top").innerHTML = `
-      <div class="gt-ano"><b>${fim ? `Fim<span class="so-largo"> do mandato</span>` : e.ano}</b><small>${fim ? `${e.anoInicial}–${e.anoFinal}` : `Ano ${n} de ${total}`}</small></div>
+      <div class="gt-ano"><b>${fim ? `Fim<span class="so-largo"> do mandato</span>` : transicao() ? "Transição" : e.ano}</b><small>${fim ? `${e.anoInicial}–${e.anoFinal}` : transicao() ? `dez. ${e.anoInicial - 1}` : `Ano ${n} de ${total}`}</small></div>
       <div class="gt-inds">${IND.map(i => {
         const v = e.nac[i.id], v0 = e.ini.nac[i.id];
         const d = v - v0, melhor = i.melhor === "maior" ? d > 0 : d < 0;
@@ -121,26 +141,36 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
 
   /* ---------- abas ---------- */
   const ABAS = [
+    { id: "raiox", nome: "Raio-X", icone: "i_idhm", so: "transicao" },
     { id: "eventos", nome: "Eventos", icone: "i_alerta" },
     { id: "ministros", nome: "Ministros", icone: "i_congresso" },
     { id: "montar", nome: "Montar", icone: "i_montar" },
     { id: "congresso", nome: "Congresso", icone: "i_aprovacao" },
-    { id: "orcamento", nome: "Orçamento", icone: "i_dinheiro" },
-    { id: "povo", nome: "Povo", icone: "i_povo" },
-    { id: "previsoes", nome: "Previsões", icone: "i_previsao" }
+    { id: "orcamento", nome: "Orçamento", icone: "i_dinheiro", transicao: true },
+    { id: "povo", nome: "Povo", icone: "i_povo", transicao: true },
+    { id: "previsoes", nome: "Previsões", icone: "i_previsao", transicao: true }
   ];
+  const abasVisiveis = () => {
+    const bloq = tut.bloqueadas();
+    return ABAS.filter(a => (transicao() ? a.so === "transicao" || a.transicao : a.so !== "transicao") && !bloq.includes(a.id));
+  };
   function renderAbas() {
     const pend = eventosPendentes(e).length;
-    const bloq = tut.bloqueadas();
-    $("#gov-tabs").innerHTML = ABAS.filter(a => !bloq.includes(a.id)).map(a => `<button type="button" role="tab" data-aba="${a.id}" aria-selected="${aba === a.id}" class="${aba === a.id ? "on" : ""}">
+    const vis = abasVisiveis();
+    if (!vis.some(a => a.id === aba)) aba = vis[0].id;
+    $("#gov-tabs").innerHTML = vis.map(a => `<button type="button" role="tab" data-aba="${a.id}" aria-selected="${aba === a.id}" class="${aba === a.id ? "on" : ""}">
       ${iconSVG(a.icone, 16)}<span>${a.nome}</span>${a.id === "eventos" && pend ? `<b class="badge">${pend}</b>` : ""}</button>`).join("");
   }
   function renderCorpo() {
-    const f = { eventos: abaEventos, ministros: abaMinistros, montar: abaMontar, congresso: abaCongresso, orcamento: abaOrcamento, povo: abaPovo, previsoes: abaPrevisoes }[aba];
+    const f = { raiox: abaRaioX, eventos: abaEventos, ministros: abaMinistros, montar: abaMontar, congresso: abaCongresso, orcamento: abaOrcamento, povo: abaPovo, previsoes: abaPrevisoes }[aba];
     $("#gov-body").innerHTML = f();
     if (aba === "montar") atualizarMontar();
   }
   function renderRodape() {
+    if (transicao()) {
+      $("#gov-foot").innerHTML = `<button type="button" class="btn wide" data-acao="ir-promessas">Escolher as promessas e tomar posse →</button><p class="gf-dica">Sem pressa: a posse é quando você quiser.</p>`;
+      return;
+    }
     const pend = eventosPendentes(e).length;
     const qtd = e.projetosAno.length;
     if (confirmando) {
@@ -155,7 +185,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
   function render() {
     root.classList.toggle("pre-posse", e.fase === "promessas");
     renderTopo(); renderAbas(); renderCorpo(); renderRodape();
-    pintarMapa(); humor(); sincronizarProjetos();
+    pintarMapa(); humor(); sincronizarProjetos(); sincronizarMinistros();
     tut.aposRender();
   }
 
@@ -227,7 +257,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
   function abaMinistros() {
     cartasUsadas[e.ano] = cartasUsadas[e.ano] || {};
     const usadas = cartasUsadas[e.ano];
-    return `<p class="intro">Seus ministros e um governador trazem propostas. Aprove as que cabem no seu plano, ou monte as suas na aba Montar.</p>
+    return `<p class="intro">Seus ministros e um governador trazem propostas. Cada um aparece no mapa, na região do pedido: toque no rosto para ver. Aprove as que cabem no seu plano, ou monte as suas na aba Montar.</p>
       <div class="proj-lista">${e.cartas.map((c, i) => cartaoProjeto(c, {
         autor: { nome: c.autor, cargo: c.cargo, fala: c.fala, cor: c.autorId.startsWith("gov") ? "#6b7c8f" : AREAS[c.autorId] && AREAS[c.autorId].cor },
         acao: `data-carta="${i}"`, estado: usadas[i]
@@ -289,6 +319,37 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
       <p class="ajuda">Dinheiro não usado reduz a dívida. Gastar além do orçamento aumenta a dívida, freia o crescimento do ano seguinte e, acima de R$ 20 bi, derruba a aprovação.</p>
       ${desteAno.length ? `<ul class="feitos">${desteAno.map(p => `<li><span>${esc(p.nome)}</span><b>${esc(bi(p.custo))}</b><button type="button" class="link" data-desfazer="${p.id}">Desfazer</button></li>`).join("")}</ul>` : `<p class="vazio">Nenhum projeto aprovado em ${e.ano} ainda.</p>`}`;
   }
+  /* Raio-X do país, para analisar antes da posse */
+  function genteNac(id, n) {
+    const P = REGIOES.reduce((s, r) => s + e.reg[r].populacao, 0), pib = (inicio && inicio.nacional.pib_trilhoes || 12.7) * 1e12;
+    return { crescimento: `≈ R$ ${nf(n.crescimento / 100 * pib / 1e9, 0)} bi a mais de riqueza no ano (R$ ${nf(n.crescimento / 100 * pib / P, 0)} por habitante)`,
+      desemprego: `≈ ${fmtGente(n.desemprego / 100 * FORCA_TRABALHO)} de pessoas procurando trabalho`,
+      idhm: "acima de 0,800 é considerado muito alto",
+      divida: `≈ R$ ${nf(n.divida / 100 * pib / P / 1000, 0)} mil por habitante`,
+      mvi: `≈ ${fmtGente(n.mvi * P / 1e5)} mortes por ano`,
+      desmatamento: `≈ ${fmtGente(n.desmatamento * 140)} campos de futebol por ano`,
+      aprovacao: `≈ ${fmtGente(n.aprovacao / 100 * ELEITORES)} de eleitores` }[id];
+  }
+  function abaRaioX() {
+    const cartoes = IND.map(i => {
+      let reg = "";
+      if (i.regional) {
+        const [a, b] = i.escala;
+        const ord = REGIOES.slice().sort((x, y) => (e.reg[x][i.regional] - e.reg[y][i.regional]) * (a < b ? 1 : -1));
+        const pior = ord[ord.length - 1];
+        reg = `<ul class="rx-reg">${ord.map(r => { const v = e.reg[r][i.regional]; const t = clamp(Math.abs(v - b) / Math.abs(a - b), 0.04, 1);
+          return `<li><span>${r}</span><i><b style="width:${(a < b ? 1 - t + 0.04 : t) * 100}%;background:${corEscala(v, i.escala)}"></b></i><em>${esc(i.fmt(v))}</em></li>`; }).join("")}</ul>
+          <small class="rx-pior">Pior situação: <b>${pior}</b>${gente(i.id, e.reg, pior) ? ` (${esc(gente(i.id, e.reg, pior))})` : ""}</small>`;
+      }
+      return `<article class="rx ${i.regional ? "reg" : ""}${indMapa === i.id ? " on" : ""}" ${i.regional ? `data-ind="${i.id}" role="button" tabindex="0"` : ""}>
+        <header>${iconSVG(i.icone, 16)}<b>${esc(i.nome)}</b><span>${esc(i.fmt(e.nac[i.id]))}</span></header>
+        <small>${esc(genteNac(i.id, e.nac))}</small>${reg}</article>`;
+    }).join("");
+    return `<p class="intro">Entre a eleição e a posse existe a ${termo("transicao", "transição de governo")}: a equipe nova recebe os números do país. Use esse tempo para descobrir onde estão os problemas. Toque num tema com regiões para pintar o mapa. Veja também quem é o povo (aba Povo), quanto dinheiro existe (Orçamento) e o que pode acontecer (Previsões).</p>
+      <div class="rx-lista">${cartoes}</div>
+      <p class="ajuda">Dados reais: IBGE, Banco Central, PNUD, Inpe e Anuário Brasileiro de Segurança Pública.</p>`;
+  }
+
   function abaPovo() {
     const nomesAreas = l => l.map(a => AREAS[a].nome.toLowerCase()).join(", ");
     const grupos = Object.entries(GRUPOS).sort((a, b) => b[1].peso - a[1].peso).map(([k, G]) => {
@@ -335,15 +396,31 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
       <p class="lead">A chefe de gabinete pode te acompanhar no primeiro ano, mostrando o país, as regras e cada tela, uma de cada vez. Leva poucos minutos.</p>
       <div class="modo">
         <button type="button" class="modo-i" data-acao="modo-guiado"><b>Governar com a ajuda do gabinete</b><small>Recomendado na primeira partida</small></button>
-        <button type="button" class="modo-i" data-acao="modo-livre"><b>Já sei jogar</b><small>Vai direto para as promessas</small></button>
+        <button type="button" class="modo-i" data-acao="modo-livre"><b>Já sei jogar</b><small>Vai direto para a transição, sem explicações</small></button>
       </div>`, "modo");
   }
+  let mp = { tema: "desemprego", onde: "Nordeste", nivel: 1 };
   function telaPromessas() {
+    const T = TEMAS_PROMESSA[mp.tema];
+    if (!T.onde.includes(mp.onde)) mp.onde = T.onde[0];
+    const idM = `m:${mp.tema}:${mp.onde}:${mp.nivel}`, pm = promessaDe(idM, e.ini);
+    const minhas = escolhidas.filter(id => id.startsWith("m:")).map(id => promessaDe(id, e.ini));
+    const cheio = escolhidas.length >= 3;
+    const sel = (k, opts) => `<select data-mp="${k}" aria-label="${k}">${opts.map(([v, t]) => `<option value="${v}" ${String(mp[k]) === String(v) ? "selected" : ""}>${esc(t)}</option>`).join("")}</select>`;
     modal(`<p class="eyebrow">1º de janeiro de ${e.anoInicial}</p>
       <h2>Você toma posse como presidente.</h2>
-      <p class="lead">Mandato de ${e.anoFinal - e.anoInicial + 1} anos. O país começa com os números reais de hoje. Antes de começar, escolha as <b>3 promessas</b> da sua campanha. No fim, você será cobrado por elas, e também por tudo o que deixou de lado.</p>
-      <div class="prom">${PROMESSAS.map(p => `<button type="button" class="prom-i ${escolhidas.includes(p.id) ? "on" : ""}" data-prom="${p.id}" aria-pressed="${escolhidas.includes(p.id)}"><span>${esc(p.texto)}</span><small>Meta: ${esc(p.alvo)}</small></button>`).join("")}</div>
-      <div class="gm-acoes"><span class="cont">${escolhidas.length} de 3</span><button type="button" class="btn big" data-acao="posse" ${escolhidas.length === 3 ? "" : "disabled"}>Tomar posse</button></div>
+      <p class="lead">Mandato de ${e.anoFinal - e.anoInicial + 1} anos. Antes, escolha as <b>3 promessas</b> da sua campanha: prontas ou montadas por você. No fim, você será cobrado por elas, e também por tudo o que deixou de lado.</p>
+      <h3 class="sub">Promessas prontas</h3>
+      <div class="prom">${PROMESSAS.map(p => { const g = promessaDe(p.id, e.ini).gente;
+        return `<button type="button" class="prom-i ${escolhidas.includes(p.id) ? "on" : ""}" data-prom="${p.id}" aria-pressed="${escolhidas.includes(p.id)}"><span>${esc(p.texto)}</span><small>Meta: ${esc(p.alvo)}${g ? " · " + esc(g) : ""}</small></button>`; }).join("")}</div>
+      <h3 class="sub">Ou monte a sua</h3>
+      <div class="mp">
+        <div class="mp-campos">${sel("tema", Object.entries(TEMAS_PROMESSA).map(([k, t]) => [k, t.nome]))}${sel("onde", T.onde.map(o => [o, o === "Brasil" ? "Brasil todo" : o]))}${sel("nivel", AMBICAO.map((a, i) => [i, a]))}</div>
+        <div class="mp-prev"><b>${esc(pm.texto)}</b><small>Meta: ${esc(pm.alvo)} · ${esc(pm.gente)}</small><small class="mp-dica">${["Dá para cumprir com um plano focado.", "Exige escolher bem e ter um pouco de sorte.", "Pouquíssimos governos conseguiriam. Vale mais, mas o risco é alto."][mp.nivel]}</small></div>
+        <button type="button" class="btn ghost" data-acao="add-promessa" ${cheio || escolhidas.includes(idM) ? "disabled" : ""}>${escolhidas.includes(idM) ? "Já escolhida" : cheio ? "Você já tem 3" : "Adicionar esta promessa"}</button>
+      </div>
+      ${minhas.length ? `<ul class="mp-minhas">${minhas.map(p => `<li><span>${esc(p.texto)}</span><small>${esc(p.ambicao)}</small><button type="button" class="link" data-tirar="${esc(p.id)}">Tirar</button></li>`).join("")}</ul>` : ""}
+      <div class="gm-acoes"><button type="button" class="btn ghost" data-acao="voltar-transicao">Voltar a analisar o país</button><span class="cont">${escolhidas.length} de 3</span><button type="button" class="btn big" data-acao="posse" ${escolhidas.length === 3 ? "" : "disabled"}>Tomar posse</button></div>
       <p class="aviso">Os dados de partida são reais (IBGE, Banco Central, PNUD, Inpe, Anuário de Segurança Pública). Os efeitos das decisões vêm de um modelo simplificado.</p>`, "promessas");
   }
 
@@ -405,13 +482,11 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
   }
   function telaFim() {
     const f = relatorioFinal(e);
-    const fmtProm = p => { const pr = PROMESSAS.find(x => x.id === p.id); const v = p.valor;
-      return ["violencia", "floresta"].includes(p.id) ? `${v >= 0 ? "−" : "+"}${nf(Math.abs(v) * 100, 0)}%` : ["norte"].includes(p.id) ? `+${nf(v, 3)}` : ["nordeste"].includes(p.id) ? `${v >= 0 ? "−" : "+"}${nf(Math.abs(v))} ponto` : p.id === "idh" ? nf(v, 3) : nf(v) + "%"; };
     const mapaInd = { crescimento: "crescimento", desemprego: "desemprego", idhm: "idhm", divida: "divida", mvi: "mvi", desmatamento: "desmatamento", aprovacao: "aprovacao" };
     modal(`<p class="eyebrow">Fim do mandato · ${e.anoInicial}–${e.anoFinal}</p>
       <h2>O Brasil que você deixou.</h2>
       <h3 class="sub">Promessas de campanha</h3>
-      <ul class="prom-res">${f.promessas.map(p => `<li class="${p.cumprida ? "ok" : "nao"}"><b>${p.cumprida ? "Cumprida" : "Não cumprida"}</b><span>${esc(p.texto)}</span><small>Resultado: ${esc(fmtProm(p))} · meta ${esc(p.alvo)}</small></li>`).join("")}</ul>
+      <ul class="prom-res">${f.promessas.map(p => `<li class="${p.cumprida ? "ok" : "nao"}"><b>${p.cumprida ? "Cumprida" : "Não cumprida"}</b><span>${esc(p.texto)}</span><small>Resultado: ${esc(p.resultado)} · meta ${esc(p.alvo)}${p.ambicao ? " · " + esc(p.ambicao.toLowerCase()) : ""}</small></li>`).join("")}</ul>
       <h3 class="sub">Legado</h3>
       <table class="tab-ind"><tbody>${f.indicadores.map(x => { const i = IND.find(y => y.id === mapaInd[x.id]); return linhaInd(i, x.ini, x.fim); }).join("")}</tbody></table>
       <h3 class="sub">Quem ficou de fora</h3>
@@ -425,13 +500,15 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
   root.addEventListener("click", ev => {
     const t = ev.target;
     const ind = t.closest("[data-ind]");
-    if (ind) { const x = IND.find(i => i.id === ind.dataset.ind); if (x && x.regional) { indMapa = x.id; renderTopo(); pintarMapa(); } return; }
+    if (ind) { const x = IND.find(i => i.id === ind.dataset.ind); if (x && x.regional) { indMapa = x.id; renderTopo(); pintarMapa(); if (aba === "raiox") { const y = $("#gov-body").scrollTop; renderCorpo(); $("#gov-body").scrollTop = y; } } return; }
     const snap = t.closest("[data-snap]");
     if (snap) { snapshot = snap.dataset.snap; renderTopo(); pintarMapa(); return; }
     const ab = t.closest("[data-aba]");
     if (ab) { aba = ab.dataset.aba; confirmando = false; ultimoMontado = null; renderAbas(); renderCorpo(); renderRodape(); abrirPainel(); tut.fecharBalao(); tut.dicaAba(aba); tut.aposRender(); return; }
     const cid = t.closest("[data-cid]");
     if (cid) { mapa.voarRegiao(cid.dataset.cid); return; }
+    const tir = t.closest("[data-tirar]");
+    if (tir) { escolhidas = escolhidas.filter(x => x !== tir.dataset.tirar); telaPromessas(); return; }
     const pr = t.closest("[data-prom]");
     if (pr) {
       const id = pr.dataset.prom;
@@ -471,7 +548,10 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     if (!ac) return;
     const a = ac.dataset.acao;
     if (a === "posse") { escolherPromessas(e, escolhidas); fecharModal(); aba = e.eventos.length ? "eventos" : "ministros"; salvar(); render(); mapa.visaoGeral(); tut.notificar("posse"); }
-    else if (a === "modo-guiado" || a === "modo-livre") { tut.comecar(a === "modo-guiado"); if (a === "modo-livre") telaPromessas(); else fecharModal(); }
+    else if (a === "modo-guiado" || a === "modo-livre") { fecharModal(); aba = "raiox"; render(); tut.comecar(a === "modo-guiado"); if (a === "modo-livre") abrirPainel(); }
+    else if (a === "ir-promessas") { telaPromessas(); tut.notificar("abrir-promessas"); }
+    else if (a === "voltar-transicao") { fecharModal(); tut.notificar("voltar"); }
+    else if (a === "add-promessa") { const id = `m:${mp.tema}:${mp.onde}:${mp.nivel}`; if (escolhidas.length < 3 && !escolhidas.includes(id)) escolhidas.push(id); telaPromessas(); }
     else if (a === "ir-eventos") { aba = "eventos"; render(); abrirPainel(); }
     else if (a === "fechar") { confirmando = true; renderRodape(); }
     else if (a === "cancelar") { confirmando = false; renderRodape(); }
@@ -492,6 +572,8 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     const r = ev.target.closest("input[data-ev]");
     if (r) { responderEvento(e, +r.dataset.ev, r.value); salvar(); renderAbas(); renderCorpo(); renderRodape(); renderTopo(); tut.notificar("evento"); return; }
     if (ev.target.closest(".montar")) { ultimoMontado = null; atualizarMontar(); }
+    const mpSel = ev.target.closest("[data-mp]");
+    if (mpSel) { mp[mpSel.dataset.mp] = mpSel.dataset.mp === "nivel" ? +mpSel.value : mpSel.value; const y = $(".gm-box").scrollTop; telaPromessas(); $(".gm-box").scrollTop = y; }
   });
 
   /* painel no celular: alça abre e fecha */
@@ -503,7 +585,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
   async function novo() {
     await carregarInicio();
     e = criarJogo(inicio, { semente: (Date.now() % 2147483647) | 0 });
-    escolhidas = []; cartasUsadas = {}; snapshot = "agora"; indMapa = "idhm"; root.classList.remove("terminado");
+    escolhidas = []; cartasUsadas = {}; snapshot = "agora"; indMapa = "idhm"; aba = "raiox"; root.classList.remove("terminado");
     tut.usar(e);
     render();
     telaModo();
@@ -513,8 +595,8 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
     tut.usar(e);
     render();
     tut.retomar();
-    if (e.fase === "promessas") telaPromessas();
-    else if (e.fase === "fim") telaFim();
+    if (e.fase === "fim") telaFim();
+    else if (e.fase === "promessas" && tut.ativo() && tut.passoId() === "promessas") telaPromessas();
     else fecharModal();
   }
 
@@ -534,6 +616,7 @@ export function criarGovernar({ mapa, inicioUrl = "data/jogo/inicio.json" }) {
       mapa.colorir(undefined);
       mapa.humor(80);
       mapa.projetos([]);
+      mapa.marcadores([]);
       mapa.modoJogo(false);
     },
     ativo: () => document.body.classList.contains("gov-on"),

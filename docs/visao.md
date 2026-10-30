@@ -43,6 +43,11 @@ Jogo de tabuleiro digital por turnos que o Otávio adora jogar com os amigos, em
 - **Barras de meta:** promessas e missões com barra de progresso sempre visível.
 - **Multiplayer:** primeiro um desafio entre amigos (todos governam o mesmo Brasil, com os mesmos eventos, e comparam a nota); depois partidas em LAN e online, talvez com cada jogador num papel (presidente, Congresso, governadores).
 
+### Som — *pedido do Otávio (29/10/2026), próxima rodada de visual e som*
+- **Trilha sonora leve**, de fundo, que muda com o humor do país (o mesmo humor que já muda o céu e o mar).
+- **Efeito sonoro no zoom:** ao aproximar de uma região ou de um estado, um som que dê a sensação de mergulhar na maquete; outro, mais suave, ao voltar para o Brasil inteiro.
+- Botão para desligar o som, e começar sempre baixo (no celular, só toca depois do primeiro toque).
+
 ### Inteligência artificial no jogo
 - **Propostas em texto livre:** o jogador escreve a ideia e a IA a transforma em projeto, com as mesmas regras de custo e efeito.
 - **Notícias do mandato:** manchetes e matérias geradas a partir do que aconteceu em cada ano.

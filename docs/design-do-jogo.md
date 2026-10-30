@@ -217,8 +217,21 @@ Decisões da conversa: **nota + reeleição + missões**; **cidadãos + manchete
 
 ### Tutorial
 - Antes do mandato: "Primeira vez? Governar com a ajuda do gabinete" ou "Já sei jogar".
-- **Chefe de gabinete** (personagem fictício) guia o primeiro ano passo a passo: o país herdado, as promessas, os eventos, as propostas, o orçamento, fechar o ano. As abas são liberadas aos poucos (Montar, Congresso, Povo e Previsões a partir do ano 2, com uma dica cada).
+- **Chefe de gabinete** (personagem fictício) guia o primeiro ano passo a passo: o país herdado, a transição, as promessas, os termômetros, os eventos, as propostas, e depois **cada aba, uma por uma** (Montar, Congresso, Orçamento, Povo, Previsões), antes de fechar o ano. Cada aba aparece quando a Marta chega nela. *Decidido (29/10/2026), depois do 2º teste do Otávio: nada de liberar abas sem explicar; tudo explicado no próprio tutorial.* Quem escolhe "Já sei jogar" vê uma dica curta na primeira visita a cada aba.
+- **Setinhas dos termômetros:** a Marta explica com um exemplo desenhado no balão (desemprego ▼ verde, dívida ▲ vermelha), porque no dia da posse ainda não há setinhas; no fim do 1º ano ela lembra que elas apareceram.
 - **Futuro:** modo tutorial no menu principal, com mandato guiado do começo ao fim e cenários de treino (ex.: "Enfrentar uma enchente", "Destravar o Congresso", "Fechar as contas").
+
+### Transição de governo — *decidido (29/10/2026)*
+- Antes da posse existe a fase **Transição** (dez. do ano anterior), sem pressa: o jogador analisa o país antes de escolher as promessas. Painel com **Raio-X** (cada termômetro com o número nacional em gente, as cinco regiões em barras e a pior região), **Povo**, **Orçamento** e **Previsões**. O mapa pinta o tema escolhido. Botão "Escolher as promessas e tomar posse" quando quiser; da tela de promessas dá para voltar a analisar.
+- Ensina algo verdadeiro: a transição de governo existe no Brasil e está prevista em lei desde 2002.
+
+### Promessas montadas pelo jogador — *decidido (29/10/2026)*
+- Além das 9 prontas, o jogador monta a sua: **tema** (emprego, qualidade de vida, segurança, floresta, economia, contas públicas, aprovação) + **onde** (Brasil ou uma região, quando o tema tem região) + **ambição** (pé no chão, ousada, muito ousada). O jogo calcula a meta e a tradução em gente (ex.: "Tirar 1 ponto do desemprego no Nordeste: ≈ 296 mil pessoas a mais trabalhando").
+- Metas calibradas pelas simulações: "pé no chão" dá para cumprir com um plano focado; "muito ousada" quase nenhum estilo de jogo alcança. Na entrega 3, a ambição vai pesar na nota do mandato.
+
+### Ministros no mapa — *decidido (29/10/2026)*
+- Cada proposta de ministro ou governador aparece na maquete como um **rosto** na região do pedido (propostas nacionais em Brasília). Passar o mouse mostra o pedido e o custo; tocar abre o cartão no painel e leva o mapa até a região. Rosto some quando a proposta é aprovada.
+- **Foco:** ao escolher uma região (no jogo) ou um estado (no explorar), ela fica nítida e o resto da maquete fica mais escuro e desfocado.
 
 ### Linguagem
 - Equilíbrio: a parte política continua (é o que o jogo ensina de mais valioso), mas sem jargão solto. Todo termo técnico ganha explicação curta ao tocar (ex.: IDHM, discricionárias, emendas).

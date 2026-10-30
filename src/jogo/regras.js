@@ -107,6 +107,85 @@ export const PROMESSAS = [
   { id: "popular",    texto: "Terminar com aprovação acima de 50%",         medir: f => f.nac.aprovacao, meta: v => v > 50, alvo: "> 50%" }
 ];
 
+/* Promessas montadas pelo jogador: tema + onde + ambição.
+   id: "m:<tema>:<onde>:<nível 0-2>"  (onde = "Brasil" ou uma região) */
+const _nf = (v, d = 1) => new Intl.NumberFormat("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
+const _gente = n => n >= 1e6 ? _nf(n / 1e6, 1) + (n >= 2e6 ? " milhões" : " milhão") : n >= 1000 ? _nf(Math.round(n / 1000), 0) + " mil" : _nf(Math.round(n), 0);
+const _no = onde => onde === "Brasil" ? "no Brasil" : "no " + onde;
+const _FT = 110e6;   // força de trabalho (PNAD Contínua)
+export const AMBICAO = ["Pé no chão", "Ousada", "Muito ousada"];
+export const TEMAS_PROMESSA = {
+  desemprego: { nome: "Emprego", onde: ["Brasil", ...REGIOES], niveis: [0.5, 1, 1.5],
+    texto: (x, o) => `Tirar ${_nf(x, x % 1 ? 1 : 0)} ponto${x >= 2 ? "s" : ""} do desemprego ${_no(o)}`, alvo: x => `−${_nf(x, x % 1 ? 1 : 0)} ponto`,
+    medir: (f, o) => o === "Brasil" ? f.ini.nac.desemprego - f.nac.desemprego : f.ini.reg[o].desemprego - f.reg[o].desemprego,
+    fmt: v => `${v >= 0 ? "−" : "+"}${_nf(Math.abs(v))} ponto`,
+    gente: (x, o, ini) => `≈ ${_gente(x / 100 * _FT * popDe(ini, o) / popDe(ini, "Brasil"))} pessoas a mais trabalhando` },
+  idhm: { nome: "Qualidade de vida (IDHM)", onde: ["Brasil", ...REGIOES], niveis: [0.01, 0.018, 0.025],
+    texto: (x, o) => `Subir ${_nf(x, 3)} no IDHM ${o === "Brasil" ? "do Brasil" : "do " + o}`, alvo: x => `+${_nf(x, 3)}`,
+    medir: (f, o) => o === "Brasil" ? f.nac.idhm - f.ini.nac.idhm : f.reg[o].idhm - f.ini.reg[o].idhm,
+    fmt: v => `${v >= 0 ? "+" : "−"}${_nf(Math.abs(v), 3)}`,
+    gente: (x, o, ini) => `mais saúde, estudo e renda para ${_gente(popDe(ini, o))} de pessoas` },
+  mvi: { nome: "Segurança", onde: ["Brasil", ...REGIOES], niveis: [0.1, 0.2, 0.3],
+    texto: (x, o) => `Reduzir as mortes violentas ${_no(o)} em ${_nf(x * 100, 0)}%`, alvo: x => `−${_nf(x * 100, 0)}%`,
+    medir: (f, o) => o === "Brasil" ? 1 - f.nac.mvi / f.ini.nac.mvi : 1 - f.reg[o].mvi / f.ini.reg[o].mvi,
+    fmt: v => `${v >= 0 ? "−" : "+"}${_nf(Math.abs(v) * 100, 0)}%`,
+    gente: (x, o, ini) => { const m = o === "Brasil" ? ini.nac.mvi : ini.reg[o].mvi; return `≈ ${_gente(x * m * popDe(ini, o) / 1e5)} vidas salvas por ano`; } },
+  desmatamento: { nome: "Floresta", onde: ["Brasil", "Norte", "Centro-Oeste", "Nordeste"], niveis: [0.25, 0.45, 0.65],
+    texto: (x, o) => `Cortar o desmatamento ${_no(o)} em ${_nf(x * 100, 0)}%`, alvo: x => `−${_nf(x * 100, 0)}%`,
+    medir: (f, o) => o === "Brasil" ? 1 - f.nac.desmatamento / f.ini.nac.desmatamento : 1 - f.reg[o].desmatamento / f.ini.reg[o].desmatamento,
+    fmt: v => `${v >= 0 ? "−" : "+"}${_nf(Math.abs(v) * 100, 0)}%`,
+    gente: (x, o, ini) => { const k = o === "Brasil" ? ini.nac.desmatamento : ini.reg[o].desmatamento; return `≈ ${_gente(x * k * 140)} campos de futebol de floresta a menos derrubados por ano`; } },
+  crescimento: { nome: "Economia", onde: ["Brasil"], niveis: [2, 2.3, 2.6],
+    texto: x => `Crescimento médio de ${_nf(x)}% ao ano`, alvo: x => `≥ ${_nf(x)}%`,
+    medir: f => f.mediaCrescimento, fmt: v => _nf(v) + "%", cmp: "valor",
+    gente: (x, o, ini) => `≈ R$ ${_nf(((1 + x / 100) ** 4 - 1) * (ini.nac.pib_trilhoes || 12.7) * 1e12 / popDe(ini, "Brasil"), 0)} a mais de renda por habitante em 4 anos` },
+  divida: { nome: "Contas públicas", onde: ["Brasil"], niveis: [90, 88, 85],
+    texto: x => `Terminar com a dívida abaixo de ${_nf(x, 0)}% do PIB`, alvo: x => `< ${_nf(x, 0)}%`,
+    medir: f => f.nac.divida, fmt: v => _nf(v) + "%", cmp: "abaixo",
+    gente: (x, o, ini) => `≈ R$ ${_nf(Math.round(x / 100 * (ini.nac.pib_trilhoes || 12.7) * 1e12 / popDe(ini, "Brasil") / 1000), 0)} mil de dívida por habitante, no máximo` },
+  aprovacao: { nome: "Aprovação", onde: ["Brasil"], niveis: [45, 55, 65],
+    texto: x => `Terminar com mais de ${_nf(x, 0)}% de aprovação`, alvo: x => `> ${_nf(x, 0)}%`,
+    medir: f => f.nac.aprovacao, fmt: v => Math.round(v) + "%", cmp: "valor",
+    gente: x => `≈ ${_gente(x / 100 * 156e6)} de eleitores satisfeitos` }
+};
+function popDe(ini, o) {
+  const R = Object.keys(ini.reg);
+  return o === "Brasil" ? R.reduce((s, r) => s + ini.reg[r].populacao, 0) : ini.reg[o].populacao;
+}
+
+/* Promessas prontas: formato do resultado e tradução em gente */
+const FMT_PRONTA = {
+  emprego: v => _nf(v) + "%", crescer: v => _nf(v) + "%", divida: v => _nf(v) + "%", popular: v => Math.round(v) + "%",
+  idh: v => _nf(v, 3), norte: v => `${v >= 0 ? "+" : "−"}${_nf(Math.abs(v), 3)}`,
+  nordeste: v => `${v >= 0 ? "−" : "+"}${_nf(Math.abs(v))} ponto`,
+  violencia: v => `${v >= 0 ? "−" : "+"}${_nf(Math.abs(v) * 100, 0)}%`, floresta: v => `${v >= 0 ? "−" : "+"}${_nf(Math.abs(v) * 100, 0)}%`
+};
+const GENTE_PRONTA = {
+  emprego: ini => `≈ ${_gente((ini.nac.desemprego - 5) / 100 * _FT)} pessoas a mais trabalhando`,
+  crescer: () => "a economia cresce mais rápido que a média dos últimos anos (1,8%)",
+  nordeste: ini => `≈ ${_gente(0.015 * _FT * popDe(ini, "Nordeste") / popDe(ini, "Brasil"))} nordestinos a mais trabalhando`,
+  idh: ini => `mais saúde, estudo e renda para ${_gente(popDe(ini, "Brasil"))} de pessoas`,
+  norte: ini => `mais saúde, estudo e renda para ${_gente(popDe(ini, "Norte"))} de pessoas`,
+  violencia: ini => `≈ ${_gente(0.2 * ini.nac.mvi * popDe(ini, "Brasil") / 1e5)} vidas salvas por ano`,
+  floresta: ini => `≈ ${_gente(0.5 * ini.nac.desmatamento * 140)} campos de futebol de floresta a menos derrubados por ano`,
+  divida: ini => `≈ R$ ${_nf(Math.round(0.88 * (ini.nac.pib_trilhoes || 12.7) * 1e12 / popDe(ini, "Brasil") / 1000), 0)} mil de dívida por habitante, no máximo`,
+  popular: () => `≈ ${_gente(0.5 * 156e6)} de eleitores satisfeitos`
+};
+
+/* Qualquer promessa (pronta ou montada) a partir do id. ini: e.ini (números do começo) */
+export function promessaDe(id, ini) {
+  const pr = PROMESSAS.find(p => p.id === id);
+  if (pr) return { ...pr, fmt: FMT_PRONTA[id], gente: ini ? GENTE_PRONTA[id](ini) : "", montada: false };
+  const m = /^m:([a-z]+):([A-Za-z\u00C0-\u00FF-]+):([0-2])$/.exec(id || "");
+  if (!m) return null;
+  const T = TEMAS_PROMESSA[m[1]], o = m[2], n = +m[3];
+  if (!T || !T.onde.includes(o)) return null;
+  const x = T.niveis[n];
+  const meta = T.cmp === "abaixo" ? v => v < x : v => v >= x;
+  return { id, texto: T.texto(x, o), alvo: T.alvo(x), medir: f => T.medir(f, o), meta, fmt: T.fmt,
+    gente: ini ? T.gente(x, o, ini) : "", montada: true, tema: m[1], onde: o, nivel: n, ambicao: AMBICAO[n] };
+}
+
 /* Personagens fictícios */
 export const MINISTROS = {
   saude:       { nome: "Helena Bastos",      cargo: "Ministra da Saúde",               jeito: "Pensa primeiro em quem está na fila do SUS." },
